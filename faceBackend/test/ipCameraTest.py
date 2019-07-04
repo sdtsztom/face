@@ -1,7 +1,6 @@
 import cv2
-import numpy as np
 
-ip='192.168.1.100'
+ip='192.168.1.103'
 port='8081'
 video="http://admin:admin@"+ip+':'+port
 cap=cv2.VideoCapture(video)

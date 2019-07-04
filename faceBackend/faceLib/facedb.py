@@ -30,7 +30,11 @@ class facedb(object):
 		return encodings
 
 	def getEncodingsByIDs(self,IDList):
-		self.cur.execute('select encoding from faceEncoding where ID in %s;'%(str(tuple(IDList))));
+		if len(IDList)==1:
+			sql='select encoding from faceEncoding where ID=%d;'%(IDList[0])
+		else:
+			sql='select encoding from faceEncoding where ID in %s;' % (str(tuple(IDList)))
+		self.cur.execute(sql);
 		res=self.cur.fetchall()
 		encodings = [np.frombuffer(res[i][0], dtype='float64') for i in range(len(IDList))]
 		return encodings

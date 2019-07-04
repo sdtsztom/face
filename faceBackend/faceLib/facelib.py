@@ -40,11 +40,9 @@ class faceFinder(object):
 		face_locations = face_recognition.face_locations(rgb_small_frame)   #speed up
 
 		# restore locations
-		for face_location_scale in face_locations:
-			if self.use_scale:
-				face_location=[int(i/self.scale_xy) for i in face_location_scale]  # restore location
-			else:
-				face_location=face_location_scale
+		if self.use_scale:
+			for i,face_location in enumerate(face_locations):
+				face_locations[i]=[int(i/self.scale_xy) for i in face_location]  # restore location
 
 		return face_locations
 
