@@ -72,6 +72,14 @@ def recordFace(frame,face_location,savepath):
 	face=frame[top:bottom,left:right]
 	cv2.imwrite(savepath,face)
 
+def recordFaces(frame,face_locations,savepaths):
+	for i in range(len(face_locations)):
+		face_location=face_locations[i]
+		savepath=savepaths[i]
+		(top, right, bottom, left) = face_location
+		face = frame[top:bottom, left:right]
+		cv2.imwrite(savepath, face)
+
 def faceCompare(knownEncodings, unknownEncoding, tolerance= 0.42):
 	return face_recognition.compare_faces(knownEncodings,unknownEncoding,tolerance)
 

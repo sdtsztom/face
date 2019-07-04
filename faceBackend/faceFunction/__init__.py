@@ -1,3 +1,6 @@
 # -*-encoding:utf-8-*-
 
-from . import CapTracker
+from . import SuspectTracker
+from . import CompareFace
+from . import faceCaper
+from . import GenEncodings

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from ..faceFunction.CapTracker import Tracker
+from ..faceFunction.SuspectTracker import Tracker
 
 tracker=Tracker('')
 
