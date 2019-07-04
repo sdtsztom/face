@@ -2,4 +2,6 @@
 
 from . import facedb
 from . import facelib
-from . import util 
+from . import util
+from . import models
+from . import transforms

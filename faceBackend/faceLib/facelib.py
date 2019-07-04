@@ -14,7 +14,14 @@ from pysot.tracker.tracker_builder import build_tracker
 import os
 import torch
 import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
 from glob import glob
+from skimage.transform import resize
+from . import transforms
+from .models import *
+from PIL import Image
 
 torch.set_num_threads(1)
 
@@ -103,6 +110,9 @@ def img2jpgBlob(img):
 def jpgBlob2img(blob):
 	return cv2.imdecode(np.frombuffer(blob,np.int8),-1)
 
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
+
 class personDetecter(object):
 	def __init__(self):
 		self.mmedeRoot='/media/tsz/Data/Work/Tracking/Library/mmdetection'
@@ -146,3 +156,39 @@ class siamTracker(object):
 		outputs = self.tracker.track(frame)
 		bbox = list(map(int, outputs['bbox']))
 		return [bbox[1],bbox[0]+bbox[2],bbox[1]+bbox[3],bbox[0]]
+
+class facialExpressionRecer(object):
+	def __init__(self):
+		self.modelpath='/media/tsz/Data/Work/Tracking/GithubProject/Facial-Expression-Recognition.Pytorch/FER2013_VGG19/PrivateTest_model.t7'
+		self.net=VGG('VGG19')
+		self.checkpoint = torch.load(self.modelpath)
+		self.net.load_state_dict(self.checkpoint['net'])
+		self.net.cuda()
+		self.net.eval()
+		self.cut_size = 44
+		self.transform_test = transforms.Compose([
+			transforms.TenCrop(self.cut_size),
+			transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
+		])
+		self.class_names = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+
+	def predict(self,frame):
+		rgbframe=frame[:,:,::-1]
+		gray = rgb2gray(rgbframe)
+		gray = resize(gray, (48, 48), mode='symmetric').astype(np.uint8)
+		img = gray[:, :, np.newaxis]
+		img = np.concatenate((img, img, img), axis=2)
+		img = Image.fromarray(img)
+		inputs = self.transform_test(img)
+		ncrops, c, h, w = np.shape(inputs)
+
+		inputs = inputs.view(-1, c, h, w)
+		inputs = inputs.cuda()
+		inputs = Variable(inputs, volatile=True)
+		outputs = self.net(inputs)
+
+		outputs_avg = outputs.view(ncrops, -1).mean(0)  # avg over crops
+
+		score = F.softmax(outputs_avg)
+		_, predicted = torch.max(outputs_avg.data, 0)
+		return self.class_names[int(predicted.cpu().numpy())]
