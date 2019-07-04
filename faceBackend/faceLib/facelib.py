@@ -10,6 +10,7 @@ from mmdet.apis import init_detector, inference_detector
 from pysot.core.config import cfg
 from pysot.models.model_builder import ModelBuilder
 from pysot.tracker.tracker_builder import build_tracker
+from .brisquequality import test_measure_BRISQUE
 
 import os
 import torch
@@ -192,3 +193,6 @@ class facialExpressionRecer(object):
 		score = F.softmax(outputs_avg)
 		_, predicted = torch.max(outputs_avg.data, 0)
 		return self.class_names[int(predicted.cpu().numpy())]
+
+def imageQualityAssement(modelpath,img):
+	return test_measure_BRISQUE(modelpath,img)

@@ -5,3 +5,4 @@ from .faceFunction.GenEncodings import *
 from .faceFunction.CompareFace import *
 from .faceFunction.faceCaper import *
 from .faceFunction.EmotionRecognizer import *
+from .faceFunction.ImageQualityAssement import *
