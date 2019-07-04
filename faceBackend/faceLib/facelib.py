@@ -76,7 +76,7 @@ def faceCompare(knownEncodings, unknownEncoding, tolerance= 0.42):
 	return face_recognition.compare_faces(knownEncodings,unknownEncoding,tolerance)
 
 def faceDistance(knownEncodings,unknownEncoding):
-	return face_recognition.face_distance((knownEncodings,unknownEncoding))
+	return face_recognition.face_distance(knownEncodings,unknownEncoding)
 
 def drawBox(frame,location,color=(0,0,255)):
 	top,right,bottom,left=location

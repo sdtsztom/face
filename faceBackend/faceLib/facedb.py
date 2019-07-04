@@ -25,7 +25,7 @@ class facedb(object):
 
 	def getAllEncodings(self):
 		self.cur.execute('select encoding from faceEncoding;')
-		res=self.cur.fetchAll()
+		res=self.cur.fetchall()
 		encodings=[np.frombuffer(res[i][0],dtype='float64') for i in range(len(res))]
 		return encodings
 
@@ -36,13 +36,13 @@ class facedb(object):
 		return encodings
 
 	def getUnencodedIDs(self):
-		self.cur.execute('select ID from faceEncoding where encoded=0')
+		self.cur.execute('select ID from faceEncoding where encoded=0;')
 		res=self.cur.fetchall()
 		UnencodedIDs=[int(res[i][0]) for i in range(len(res))]
 		return UnencodedIDs
 
 	def getFaceByID(self,ID):
-		self.cur.execute('select face from faceEncoding where ID=%d'%(ID))
+		self.cur.execute('select face from faceEncoding where ID=%d;'%(ID))
 		res = self.cur.fetchall()
 		return res[0][0]
 
@@ -51,3 +51,11 @@ class facedb(object):
 		sql='insert into faceEncoding(encoding) values(%s) where '+temp
 		self.cur.execute('update faceEncoding set encoding=%s,encoded=1 where '+temp,(encoding.tostring()))
 		self.conn.commit()
+
+	def getPeopleInfoByIndexes(self,Indexes):
+		info=[0]*len(Indexes)
+		for i,index in enumerate(Indexes):
+			self.cur.execute('select ID,name from faceEncoding limit %d,1;'%index);
+			res=self.cur.fetchall()
+			info[i]=[res[0][0],res[0][1]]
+		return info
