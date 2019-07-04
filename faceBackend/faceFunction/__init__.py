@@ -4,3 +4,4 @@ from . import SuspectTracker
 from . import CompareFace
 from . import faceCaper
 from . import GenEncodings
+from . import EmotionRecognizer

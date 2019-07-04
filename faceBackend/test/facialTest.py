@@ -13,7 +13,6 @@ while True:
 		frameNum+=1
 		if frameNum%10==0:
 			locations=fFinder.findFaces(frame)
-			print(len(locations))
 			if locations:
 				face=fl.cropFace(frame,locations[0])
 				mood=facialRecer.predict(face)
