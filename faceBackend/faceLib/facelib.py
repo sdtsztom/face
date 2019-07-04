@@ -140,8 +140,9 @@ class siamTracker(object):
 		self.tracker = build_tracker(self.model)
 
 	def init(self,frame,x,y,width,height):
-		init_rect = [x, y, width, height]
-		self.tracker.init(frame, init_rect)
+		self.tracker.init(frame, [x, y, width, height])
+
+	def track(self,frame):
 		outputs = self.tracker.track(frame)
 		bbox = list(map(int, outputs['bbox']))
 		return [bbox[1],bbox[0]+bbox[2],bbox[1]+bbox[3],bbox[0]]

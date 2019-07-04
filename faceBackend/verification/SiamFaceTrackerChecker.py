@@ -1,7 +1,7 @@
 import faceBackend as fb
 import cv2
 
-tracker=fb.FaceTracker([1])
+tracker=fb.SiamFaceTracker([1])
 cap=cv2.VideoCapture('http://admin:admin@192.168.1.103:8081')
 while True:
     ret,frame=cap.read()
