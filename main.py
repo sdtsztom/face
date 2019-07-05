@@ -389,8 +389,9 @@ class Ui_MainWindow(object):
 		self.label_compare_verify_tag.setText("")
 		self.label_compare_verify_tag.setObjectName("label_compare_verify_tag")
 		self.listViewFileName = QtWidgets.QListView(self.frame_compare_verify)
-		self.listViewFileName.setGeometry(QtCore.QRect(310, 140, 761, 421))
+		self.listViewFileName.setGeometry(QtCore.QRect(310, 90, 761, 500))
 		self.listViewFileName.setObjectName("listViewFileName")
+		self.listViewFileName.setStyleSheet("border-image: url(:/frame.png);")
 		self.selectPicBtn2 = QtWidgets.QPushButton(self.frame_compare_verify)
 		self.selectPicBtn2.setGeometry(QtCore.QRect(515, 590, 131, 51))
 		self.selectPicBtn2.setStyleSheet("QPushButton{border-image: url(:/selectBtn.png)}\n"
@@ -526,10 +527,20 @@ class Ui_MainWindow(object):
 		self.selectPicBtn2.clicked.connect(self.SelectPicsBtnEvent)
 		self.comVerifyStartBtn.clicked.connect(self.VerifyCompareBtnEvent)
 		self.trackCameraSwitch.clicked.connect(self.TrackCameraSwitchEvent)
+		self.cap_selectPicBtn.clicked.connect(self.CapSelectPicBtnEvent)
+		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
+		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
 		self.cameraIsOn = False
+		self.cap = cv2.VideoCapture()
+		self.cameraTimer = QtCore.QTimer()
+		self.CAM_NUM = 0
+		self.isEmCam=True
+
+		self.cameraTimer.timeout.connect(self.ShowCamera)
+
 
 		#self.FrameSwitch(self.frame_capture)
 
@@ -619,7 +630,7 @@ class Ui_MainWindow(object):
 			img=fl.jpgBlob2img(imgBlob)
 			show = cv2.resize(img, (self.photo0.width(), self.photo0.height()))
 			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3*show.shape[1],QtGui.QImage.Format_RGB888)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],3*show.shape[1], QtGui.QImage.Format_RGB888)
 			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
 		imageAss=fb.ImageQualityAssement()
 		score = imageAss.assement(imgOr)
@@ -643,9 +654,73 @@ class Ui_MainWindow(object):
 		if(self.cameraIsOn==False):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
 			self.cameraIsOn=True
+			self.isEmCam=False
+			self.OpenCamera()
 		else:
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
+			self.CloseCamera()
+
+
+	def CapSelectPicBtnEvent(self):
+		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+		self.ImagePath=Image
+		PImage=QPixmap(Image)
+		SPImage=PImage.scaled(self.cap_photo0.width(),self.cap_photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
+		self.cap_photo0.setPixmap(SPImage)
+	def StartCapBtnEvent(self):
+		imgOr=cv2.imread(self.ImagePath)
+		caper=fb.faceCaper()
+		img=caper.cap(imgOr)
+		show = cv2.resize(img, (self.cap_photo0_2.width(), self.cap_photo0_2.height()))
+		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
+		self.cap_photo0_2.setPixmap(QtGui.QPixmap.fromImage(showImage))
+
+	def EmotionCameraSwitchEvent(self):
+		if(self.cameraIsOn==False):
+			self.emCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
+			self.cameraIsOn=True
+			self.isEmCam=True
+			self.OpenCamera()
+		else:
+			self.emCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
+			self.cameraIsOn=False
+			self.CloseCamera()
+
+	def OpenCamera(self):
+		if self.cameraTimer.isActive() == False:
+			flag = self.cap.open(self.CAM_NUM)
+			if flag == False:
+				msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请检测相机与电脑是否连接正确",
+													buttons=QtWidgets.QMessageBox.Ok,
+													defaultButton=QtWidgets.QMessageBox.Ok)
+			else:
+				self.cameraTimer.start(30)
+
+	def CloseCamera(self):
+		if self.cameraTimer.isActive() == True:
+			self.cameraTimer.stop()
+			self.cap.release()
+			if self.isEmCam:
+				self.emLabelShowCamera.clear()
+			else:
+				self.trackLabelShowCamera.clear()
+
+	def ShowCamera(self):
+		_, self.image = self.cap.read()
+		if self.isEmCam==True:
+			show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
+		else:
+			show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
+
+		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],show.shape[1]*3, QtGui.QImage.Format_RGB888)
+		if self.isEmCam==True:
+			self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+		else:
+			self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+
 
 import picture_rc
 
