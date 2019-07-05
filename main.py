@@ -663,7 +663,7 @@ class Ui_MainWindow(object):
 		imgOr=cv2.imread(self.ImagePath)
 		caper=fb.faceCaper()
 		img=caper.cap(imgOr)
-		show = cv2.resize(img, (self.cap_photo0_2.width(), self.photo0.height()))
+		show = cv2.resize(img, (self.cap_photo0_2.width(), self.cap_photo0_2.height()))
 		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
 		self.cap_photo0_2.setPixmap(QtGui.QPixmap.fromImage(showImage))
