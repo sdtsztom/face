@@ -1,6 +1,7 @@
 from ..faceLib import facelib as fl
 from ..faceLib import facedb as fdb
 from ..faceLib import util
+import numpy as np
 
 class FaceTracker(object):
     def __init__(self,wantIDs,use_scale=True,scale_xy=0.25):
@@ -66,3 +67,34 @@ class SiamFaceTracker(object):
         else:
             location=self.siamTracker.track(frame)
         return fl.drawBox(frame, location)
+
+class SiamBodyTracker(object):
+    def __init__(self,wantIDs,use_scale=True,scale_xy=0.25):
+        self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
+        self.siamTracker=fl.siamTracker()
+        self.siamTracker.loadModel()
+        self.peopleDetecter=fl.personDetecter()
+        self.detected=False
+
+    def track(self,frame):
+        if not self.detected:
+            locations=self.faceTracker.track(frame,True)
+            if locations:
+                top,right,bottom,left=locations[0]
+                self.detected=True
+                peopleRects=self.peopleDetecter.findPeople(frame)
+                overlaps=self.Overlaps([left,top,right,bottom],peopleRects)
+                indexBiggestOverlap=np.array(overlaps).argsort()[-1]
+                left,top,right,bottom=peopleRects[indexBiggestOverlap]
+                location=[top,right,bottom,left]
+                self.siamTracker.init(frame,left,top,right-left,bottom-top)
+        else:
+            location=self.siamTracker.track(frame)
+        return fl.drawBox(frame, location)
+
+    def Overlaps(self, faceRect, BodyRects):
+        overlaps=[0]*len(BodyRects)
+        for i,bodyRect in enumerate(BodyRects):
+            if util.checkIntersect(faceRect, bodyRect):
+                overlaps[i]=util.Overlap(faceRect, bodyRect)
+
