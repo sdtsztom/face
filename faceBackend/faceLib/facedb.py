@@ -63,3 +63,13 @@ class facedb(object):
 			res=self.cur.fetchall()
 			info[i]=[res[0][0],res[0][1]]
 		return info
+
+	def getFacesByIDs(self,IDList):
+		if len(IDList)==1:
+			sql='select face from faceEncoding where ID=%d;'%(IDList[0])
+		else:
+			sql='select face from faceEncoding where ID in %s;' % (str(tuple(IDList)))
+		self.cur.execute(sql);
+		res=self.cur.fetchall()
+		faces = [res[i][0] for i in range(len(IDList))]
+		return faces

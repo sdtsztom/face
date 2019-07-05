@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-#import faceBackend as fb
+import faceBackend as fb
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -573,7 +573,7 @@ class Ui_MainWindow(object):
 
     def EncodeAllChecker(self):
         fb.genEncodings()
-        msg=QMessageBox.information(self,"信息","建模已完成！", QMessageBox.Yes)
+        msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
 
 import picture_rc
 
