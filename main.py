@@ -7,7 +7,11 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-#import faceBackend as fb
+import faceBackend as fb
+from ..faceLib import facelib as fl
+from ..faceLib import facedb as fdb
+import numpy as np
+import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -190,6 +194,7 @@ class Ui_MainWindow(object):
 "QPushButton:pressed{border-image: url(:/selectBtnActive.png)}")
         self.cap_selectPicBtn.setText("")
         self.cap_selectPicBtn.setObjectName("cap_selectPicBtn")
+
         self.cap_photo0_2 = QtWidgets.QLabel(self.frame_capture)
         self.cap_photo0_2.setGeometry(QtCore.QRect(709, 129, 561, 491))
         self.cap_photo0_2.setText("")
@@ -326,6 +331,15 @@ class Ui_MainWindow(object):
 "QPushButton:pressed{border-image: url(:/selectBtnActive.png)}")
         self.selectPicBtn.setText("")
         self.selectPicBtn.setObjectName("selectPicBtn")
+
+        self.com_startBtn = QtWidgets.QPushButton(self.frame_compare)
+        self.com_startBtn.setGeometry(QtCore.QRect(170, 690, 131, 51))
+        self.com_startBtn.setStyleSheet("QPushButton{border-image: url(:/startBtn.png)}\n"
+"QPushButton:hover{border-image: url(:/startBtnHover.png)}\n"
+"QPushButton:pressed{border-image: url(:/startBtnActive.png)}")
+        self.com_startBtn.setText("")
+        self.com_startBtn.setObjectName("com_startBtn")
+
         self.label_compare_tag = QtWidgets.QLabel(self.frame_compare)
         self.label_compare_tag.setGeometry(QtCore.QRect(1175, 0, 131, 131))
         self.label_compare_tag.setStyleSheet("border-image: url(:/ComTag.png);")
@@ -451,6 +465,7 @@ class Ui_MainWindow(object):
         self.photo4.raise_()
         self.photo5.raise_()
         self.selectPicBtn.raise_()
+        self.com_startBtn.raise_()
         self.label_compare_tag.raise_()
         self.label_compareResult.raise_()
         self.clearPicBtn.raise_()
@@ -565,15 +580,22 @@ class Ui_MainWindow(object):
         self.FrameSwitch(self.frame_compare_verify)
     def SelectPicBtnEvent(self):
         Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+        self.ImagePath=Image
         PImage=QPixmap(Image)
         SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
-        self.photo0.setPixmap(SPImage)        
+        self.photo0.setPixmap(SPImage)
+    def ComStartBtnEvent(self):
+        info=cv2.imread(self.ImagePath)
+        for personInfo in info:
+            ID,name,dis=personInfo
+            self.labelInfo1.setText("ID:",ID," Name:",name," Dis:",dis)
+    def clearPicBtn
         
         
 
     def EncodeAllChecker(self):
         fb.genEncodings()
-        msg=QMessageBox.information(self,"信息","建模已完成！", QMessageBox.Yes)
+        msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
 
 import picture_rc
 
