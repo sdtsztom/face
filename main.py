@@ -529,7 +529,6 @@ class Ui_MainWindow(object):
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
-
 		self.cameraIsOn = False
 
 		#self.FrameSwitch(self.frame_capture)
