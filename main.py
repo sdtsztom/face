@@ -8,9 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import faceBackend as fb
-from ..faceLib import facelib as fl
-from ..faceLib import facedb as fdb
-import numpy as np
+from faceBackend.faceLib import facelib as fl
+from faceBackend.faceLib import facedb as fdb
+#import numpy as np
 import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -18,10 +18,12 @@ from PyQt5.QtWidgets import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        #self.db=fdb.facedb()
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(1302, 901)
-        
+
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -510,7 +512,7 @@ class Ui_MainWindow(object):
         self.capTagUs.clicked.connect(self.CaptureTabEvent)
         self.traTagUs.clicked.connect(self.TrackTabEvent)
         self.emTagUs.clicked.connect(self.EmotionTabEvent)
-        
+
 
         self.pushButton.clicked.connect(self.EncodeAllChecker)
 
@@ -519,12 +521,13 @@ class Ui_MainWindow(object):
         self.searchTypeBtn_2.clicked.connect(self.SearchTypeBtnEvent)
         self.verifyTypeBtn_2.clicked.connect(self.VerifyTypeBtnEvent)
         self.selectPicBtn.clicked.connect(self.SelectPicBtnEvent)
+        self.clearPicBtn.clicked.connect(self.clearPicBtnEvent)
 
 
 
 
 
-        
+
         #self.FrameSwitch(self.frame_capture)
 
     def retranslateUi(self, MainWindow):
@@ -566,10 +569,10 @@ class Ui_MainWindow(object):
         self.FrameSwitch(self.frame_compare)
     def CaptureTabEvent(self):
         self.TabStateChange(self.capTagS,self.capTagUs)
-        self.FrameSwitch(self.frame_capture)    
+        self.FrameSwitch(self.frame_capture)
     def TrackTabEvent(self):
         self.TabStateChange(self.traTagS,self.traTagUs)
-        self.FrameSwitch(self.frame_tracker)  
+        self.FrameSwitch(self.frame_tracker)
     def EmotionTabEvent(self):
         self.TabStateChange(self.emTagS,self.emTagUs)
         self.FrameSwitch(self.frame_em)
@@ -584,14 +587,32 @@ class Ui_MainWindow(object):
         PImage=QPixmap(Image)
         SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
         self.photo0.setPixmap(SPImage)
+
     def ComStartBtnEvent(self):
-        info=cv2.imread(self.ImagePath)
+        imgOr=cv2.imread(self.ImagePath)
+        info=fb.faceSearchCompare(imgOr)
         for personInfo in info:
             ID,name,dis=personInfo
             self.labelInfo1.setText("ID:",ID," Name:",name," Dis:",dis)
-    def clearPicBtn
-        
-        
+            imgBlob=self.db.getFaceByID(int(ID))
+            img=fl.jpgBlob2img(imgBlob)
+            show = cv2.resize(self.image, (self.labelInfo1.width(), self.labelInfo1.heigh()))
+            show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+            showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
+            self.photo1.setPixmap(QtGui.QPixmap.fromImage(showImage))
+        imageAss=fb.ImageQualityAssement()
+        score = imageAss.assement(imgOr)
+        self.label_compareResult.setText("Result：目标已找到,质量评估分数：",score)
+
+    def clearPicBtnEvent(self):
+        self.photo0.clear()
+        self.photo1.clear()
+        self.photo2.clear()
+        self.photo3.clear()
+        self.photo4.clear()
+        self.photo5.clear()
+
+
 
     def EncodeAllChecker(self):
         fb.genEncodings()
