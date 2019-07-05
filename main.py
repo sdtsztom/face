@@ -7,10 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-# import faceBackend as fb
-# from faceBackend.faceLib import facelib as fl
-# from faceBackend.faceLib import facedb as fdb
-# #import numpy as np
+import faceBackend as fb
+from faceBackend.faceLib import facelib as fl
+from faceBackend.faceLib import facedb as fdb
+import numpy as np
 import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import *
 
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
-		#self.db=fdb.facedb()
+		self.db=fdb.facedb()
 
 		MainWindow.setObjectName("MainWindow")
 		MainWindow.setEnabled(True)
@@ -526,7 +526,8 @@ class Ui_MainWindow(object):
 		self.selectPicBtn2.clicked.connect(self.SelectPicsBtnEvent)
 		self.comVerifyStartBtn.clicked.connect(self.VerifyCompareBtnEvent)
 
-
+		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
+		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
 
 
 
@@ -604,27 +605,27 @@ class Ui_MainWindow(object):
 		for imgName in self.tempslm.stringList():
 			imageList.append(cv2.imread(imgName))
 		Result=fb.faceCheckCompare(imageList)
+		print(Result)
 		if Result==True:
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
 			self.label_verifyResult.setText("Result:不是同一个人")
 
 	def ComStartBtnEvent(self):
-		pass
-		# imgOr=cv2.imread(self.ImagePath)
-		# info=fb.faceSearchCompare(imgOr)
-		# for personInfo in info:
-		#     ID,name,dis=personInfo
-		#     self.labelInfo1.setText("ID:",ID," Name:",name," Dis:",dis)
-		#     imgBlob=self.db.getFaceByID(int(ID))
-		#     img=fl.jpgBlob2img(imgBlob)
-		#     show = cv2.resize(self.image, (self.labelInfo1.width(), self.labelInfo1.heigh()))
-		#     show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-		#     showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
-		#     self.photo1.setPixmap(QtGui.QPixmap.fromImage(showImage))
-		# imageAss=fb.ImageQualityAssement()
-		# score = imageAss.assement(imgOr)
-		# self.label_compareResult.setText("Result：目标已找到,质量评估分数：",score)
+		imgOr=cv2.imread(self.ImagePath)
+		info=fb.faceSearchCompare(imgOr)
+		for personInfo,photo,labelInfo in zip(info,self.photoPool[1:],self.labelInfoPool):
+			ID,name,dis=personInfo
+			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(ID,name,dis))
+			imgBlob=self.db.getFaceByID(int(ID))
+			img=fl.jpgBlob2img(imgBlob)
+			show = cv2.resize(img, (self.photo0.width(), self.photo0.height()))
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
+			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
+		imageAss=fb.ImageQualityAssement()
+		score = imageAss.assement(imgOr)
+		self.label_compareResult.setText("Result：目标已找到,质量评估分数：%f"%(score))
 
 	def clearPicBtnEvent(self):
 		self.photo0.clear()
