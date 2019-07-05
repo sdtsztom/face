@@ -531,6 +531,7 @@ class Ui_MainWindow(object):
 
 
 
+
 		#self.FrameSwitch(self.frame_capture)
 
 	def retranslateUi(self, MainWindow):
@@ -590,7 +591,6 @@ class Ui_MainWindow(object):
 		PImage=QPixmap(Image)
 		SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
 		self.photo0.setPixmap(SPImage)
-
 	def SelectPicsBtnEvent(self):
 		images,_=QFileDialog.getOpenFileNames(self.centralwidget,"select file","C:/")
 		slm = QStringListModel()
@@ -598,7 +598,6 @@ class Ui_MainWindow(object):
 		self.tempslm=slm
 		#print(slm.stringList())
 		self.listViewFileName.setModel(slm)
-
 	def	VerifyCompareBtnEvent(self):
 		imageList = []
 		for imgName in self.tempslm.stringList():
@@ -608,14 +607,13 @@ class Ui_MainWindow(object):
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
 			self.label_verifyResult.setText("Result:不是同一个人")
-
 	def ComStartBtnEvent(self):
 		pass
 		# imgOr=cv2.imread(self.ImagePath)
 		# info=fb.faceSearchCompare(imgOr)
 		# for personInfo in info:
 		#     ID,name,dis=personInfo
-		#     self.labelInfo1.setText("ID:",ID," Name:",name," Dis:",dis)
+		#     self.labelInfo1.setText("ID:%s Name:%s Dis:%s"%(ID,name,dis))
 		#     imgBlob=self.db.getFaceByID(int(ID))
 		#     img=fl.jpgBlob2img(imgBlob)
 		#     show = cv2.resize(self.image, (self.labelInfo1.width(), self.labelInfo1.heigh()))
@@ -625,6 +623,9 @@ class Ui_MainWindow(object):
 		# imageAss=fb.ImageQualityAssement()
 		# score = imageAss.assement(imgOr)
 		# self.label_compareResult.setText("Result：目标已找到,质量评估分数：",score)
+
+	def TrackCameraSwitchEvent(self):
+		self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
 
 	def clearPicBtnEvent(self):
 		self.photo0.clear()
