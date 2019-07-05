@@ -526,6 +526,8 @@ class Ui_MainWindow(object):
 		self.selectPicBtn2.clicked.connect(self.SelectPicsBtnEvent)
 		self.comVerifyStartBtn.clicked.connect(self.VerifyCompareBtnEvent)
 		self.trackCameraSwitch.clicked.connect(self.TrackCameraSwitchEvent)
+		self.cap_selectPicBtn.clicked.connect(self.CapSelectPicBtnEvent)
+		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
@@ -648,6 +650,24 @@ class Ui_MainWindow(object):
 		else:
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
+
+
+	def CapSelectPicBtnEvent(self):
+		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+		self.ImagePath=Image
+		PImage=QPixmap(Image)
+		SPImage=PImage.scaled(self.cap_photo0.width(),self.cap_photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
+		self.cap_photo0.setPixmap(SPImage)
+
+	def StartCapBtnEvent(self):
+		imgOr=cv2.imread(self.ImagePath)
+		caper=fb.faceCaper()
+		img=caper.cap(imgOr)
+		show = cv2.resize(img, (self.cap_photo0_2.width(), self.photo0.height()))
+		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
+		self.cap_photo0_2.setPixmap(QtGui.QPixmap.fromImage(showImage))
+
 
 import picture_rc
 
