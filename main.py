@@ -15,6 +15,7 @@ import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import os.path as path
 
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
@@ -648,7 +649,7 @@ class Ui_MainWindow(object):
 
 	def EncodeAllChecker(self):
 		fb.genEncodings()
-		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
+		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Ok)
 
 	def TrackCameraSwitchEvent(self):
 		if(self.cameraIsOn==False):
@@ -672,6 +673,8 @@ class Ui_MainWindow(object):
 		imgOr=cv2.imread(self.ImagePath)
 		caper=fb.faceCaper()
 		img=caper.cap(imgOr)
+		caper.save()
+		msg=QMessageBox.information(self.centralwidget,"信息","人脸图片已自动保存到%s！"%(path.abspath('.')), QMessageBox.Ok)
 		show = cv2.resize(img, (self.cap_photo0_2.width(), self.cap_photo0_2.height()))
 		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
