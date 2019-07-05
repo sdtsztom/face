@@ -350,7 +350,7 @@ class Ui_MainWindow(object):
 		self.label_compareResult = QtWidgets.QLabel(self.frame_compare)
 		self.label_compareResult.setGeometry(QtCore.QRect(40, 760, 531, 51))
 		self.label_compareResult.setStyleSheet("border-image: url(:/ResultBar.png);\n"
-"font-size:30px;\n"
+"font-size:20px;\n"
 "font-weight:bold;\n"
 "font-family:Roman times;")
 		self.label_compareResult.setAlignment(QtCore.Qt.AlignCenter)
@@ -525,10 +525,11 @@ class Ui_MainWindow(object):
 		self.com_startBtn.clicked.connect(self.ComStartBtnEvent)
 		self.selectPicBtn2.clicked.connect(self.SelectPicsBtnEvent)
 		self.comVerifyStartBtn.clicked.connect(self.VerifyCompareBtnEvent)
+		self.trackCameraSwitch.clicked.connect(self.TrackCameraSwitchEvent)
 
-
-
-
+		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
+		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
+		self.cameraIsOn = False
 
 
 
@@ -541,15 +542,15 @@ class Ui_MainWindow(object):
 		self.trackType1RB.setText(_translate("MainWindow", "检测式追踪"))
 		self.trackType2RB.setText(_translate("MainWindow", "高级面部追踪"))
 		self.trackType3RB.setText(_translate("MainWindow", "高级身体追踪"))
-		self.label_emotionResult.setText(_translate("MainWindow", "Result：是真人"))
-		self.label_emotionType.setText(_translate("MainWindow", "做出表情："))
-		self.label_compareResult.setText(_translate("MainWindow", "Result：目标已找到"))
-		self.label_verifyResult.setText(_translate("MainWindow", "Result：是同一个人"))
-		self.labelInfo1.setText(_translate("MainWindow", "ID:***** Name:******* Dis:**%"))
-		self.labelInfo2.setText(_translate("MainWindow", "ID:***** Name:******* Dis:**%"))
-		self.labelInfo3.setText(_translate("MainWindow", "ID:***** Name:******* Dis:**%"))
-		self.labelInfo4.setText(_translate("MainWindow", "ID:***** Name:******* Dis:**%"))
-		self.labelInfo5.setText(_translate("MainWindow", "ID:***** Name:******* Dis:**%"))
+		self.label_emotionResult.setText(_translate("MainWindow", ""))
+		self.label_emotionType.setText(_translate("MainWindow", ""))
+		self.label_compareResult.setText(_translate("MainWindow", ""))
+		self.label_verifyResult.setText(_translate("MainWindow", ""))
+		self.labelInfo1.setText(_translate("MainWindow", ""))
+		self.labelInfo2.setText(_translate("MainWindow", ""))
+		self.labelInfo3.setText(_translate("MainWindow", ""))
+		self.labelInfo4.setText(_translate("MainWindow", ""))
+		self.labelInfo5.setText(_translate("MainWindow", ""))
 		self.labelPS.setText(_translate("MainWindow", "Dis越小越相似，质量检测值越小质量越高"))
 
 	def FrameSwitch(self,frame):
@@ -591,6 +592,7 @@ class Ui_MainWindow(object):
 		PImage=QPixmap(Image)
 		SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
 		self.photo0.setPixmap(SPImage)
+
 	def SelectPicsBtnEvent(self):
 		images,_=QFileDialog.getOpenFileNames(self.centralwidget,"select file","C:/")
 		slm = QStringListModel()
@@ -598,6 +600,7 @@ class Ui_MainWindow(object):
 		self.tempslm=slm
 		#print(slm.stringList())
 		self.listViewFileName.setModel(slm)
+
 	def	VerifyCompareBtnEvent(self):
 		imageList = []
 		for imgName in self.tempslm.stringList():
@@ -607,25 +610,22 @@ class Ui_MainWindow(object):
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
 			self.label_verifyResult.setText("Result:不是同一个人")
-	def ComStartBtnEvent(self):
-		pass
-		# imgOr=cv2.imread(self.ImagePath)
-		# info=fb.faceSearchCompare(imgOr)
-		# for personInfo in info:
-		#     ID,name,dis=personInfo
-		#     self.labelInfo1.setText("ID:%s Name:%s Dis:%s"%(ID,name,dis))
-		#     imgBlob=self.db.getFaceByID(int(ID))
-		#     img=fl.jpgBlob2img(imgBlob)
-		#     show = cv2.resize(self.image, (self.labelInfo1.width(), self.labelInfo1.heigh()))
-		#     show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-		#     showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
-		#     self.photo1.setPixmap(QtGui.QPixmap.fromImage(showImage))
-		# imageAss=fb.ImageQualityAssement()
-		# score = imageAss.assement(imgOr)
-		# self.label_compareResult.setText("Result：目标已找到,质量评估分数：",score)
 
-	def TrackCameraSwitchEvent(self):
-		self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
+	def ComStartBtnEvent(self):
+		imgOr=cv2.imread(self.ImagePath)
+		info=fb.faceSearchCompare(imgOr)
+		for personInfo,photo,labelInfo in zip(info,self.photoPool[1:],self.labelInfoPool):
+			ID,name,dis=personInfo
+			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(ID,name,dis))
+			imgBlob=self.db.getFaceByID(int(ID))
+			img=fl.jpgBlob2img(imgBlob)
+			show = cv2.resize(img, (self.photo0.width(), self.photo0.height()))
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],3*show.shape[1], QtGui.QImage.Format_RGB888)
+			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
+		imageAss=fb.ImageQualityAssement()
+		score = imageAss.assement(imgOr)
+		self.label_compareResult.setText("Result：目标已找到,质量评估分数：%f"%(score))
 
 	def clearPicBtnEvent(self):
 		self.photo0.clear()
@@ -640,6 +640,14 @@ class Ui_MainWindow(object):
 	def EncodeAllChecker(self):
 		fb.genEncodings()
 		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
+
+	def TrackCameraSwitchEvent(self):
+		if(self.cameraIsOn==False):
+			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
+			self.cameraIsOn=True
+		else:
+			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
+			self.cameraIsOn=False
 
 import picture_rc
 
