@@ -605,7 +605,6 @@ class Ui_MainWindow(object):
 		for imgName in self.tempslm.stringList():
 			imageList.append(cv2.imread(imgName))
 		Result=fb.faceCheckCompare(imageList)
-		print(Result)
 		if Result==True:
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
@@ -621,7 +620,7 @@ class Ui_MainWindow(object):
 			img=fl.jpgBlob2img(imgBlob)
 			show = cv2.resize(img, (self.photo0.width(), self.photo0.height()))
 			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3*show.shape[1],QtGui.QImage.Format_RGB888)
 			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
 		imageAss=fb.ImageQualityAssement()
 		score = imageAss.assement(imgOr)
