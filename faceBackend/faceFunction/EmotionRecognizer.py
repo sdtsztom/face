@@ -12,5 +12,8 @@ class EmotionRecognizer(object):
         return self.EmotionPool.pop(random.randrange(1,len(self.supportEmotion)))
     def reset(self):
         self.EmotionPool=self.supportEmotion
-    def getEmotion(self,frame):
-        return self.recog.predict(frame)
+    def getEmotion(self,frame,expectEmotion=None):
+        if expectEmotion is None:
+            return self.recog.predict(frame)
+        else:
+            return expectEmotion==self.recog.predict(frame)
