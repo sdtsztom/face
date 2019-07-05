@@ -4,7 +4,7 @@ import numpy as np
 
 def faceSearchCompare(img, location=None):
     if not location:
-        fFinder=fl.faceFinder();
+        fFinder=fl.faceFinder()
         location=fFinder.findFaces(img)[0]
     unknown_encoding=fl.encodeFace(img,location)
     db=fdb.facedb()
@@ -16,7 +16,7 @@ def faceSearchCompare(img, location=None):
     return info
 
 def faceCheckCompare(imgList):
-    fFinder = fl.faceFinder();
+    fFinder = fl.faceFinder()
     encodings=[0]*len(imgList)
     for i,img in enumerate(imgList):
         location=fFinder.findFaces(img)[0]

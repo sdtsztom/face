@@ -7,7 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import faceBackend as fb
+#import faceBackend as fb
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -96,7 +99,7 @@ class Ui_MainWindow(object):
         self.frame_tracker.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_tracker.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_tracker.setObjectName("frame_tracker")
-        self.frame_tracker.setVisible(False)
+        self.frame_tracker.close()
         self.label_tracker_tag = QtWidgets.QLabel(self.frame_tracker)
         self.label_tracker_tag.setGeometry(QtCore.QRect(1175, 0, 131, 131))
         self.label_tracker_tag.setStyleSheet("border-image: url(:/TraTag.png);")
@@ -164,7 +167,7 @@ class Ui_MainWindow(object):
         self.frame_capture.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_capture.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_capture.setObjectName("frame_capture")
-        self.frame_capture.setVisible(False)
+        self.frame_capture.close()
         self.label_encode_tag_2 = QtWidgets.QLabel(self.frame_capture)
         self.label_encode_tag_2.setGeometry(QtCore.QRect(1175, 0, 131, 131))
         self.label_encode_tag_2.setStyleSheet("border-image: url(:/CapTag.png);")
@@ -213,7 +216,7 @@ class Ui_MainWindow(object):
         self.frame_em.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_em.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_em.setObjectName("frame_em")
-        self.frame_em.setVisible(False)
+        self.frame_em.close()
         self.label_emotion_tag = QtWidgets.QLabel(self.frame_em)
         self.label_emotion_tag.setGeometry(QtCore.QRect(1175, 0, 131, 131))
         self.label_emotion_tag.setStyleSheet("border-image: url(:/EmTag.png);")
@@ -255,7 +258,7 @@ class Ui_MainWindow(object):
         self.frame_compare.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_compare.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_compare.setObjectName("frame_compare")
-        self.frame_compare.setVisible(False)
+        self.frame_compare.close()
         self.photoFrame0 = QtWidgets.QLabel(self.frame_compare)
         self.photoFrame0.setGeometry(QtCore.QRect(120, 230, 260, 370))
         self.photoFrame0.setStyleSheet("border-image: url(:/frame.png);")
@@ -353,8 +356,8 @@ class Ui_MainWindow(object):
         self.verifyTypeBtn.setStyleSheet("border-image: url(:/VerifyBtn.png);")
         self.verifyTypeBtn.setText("")
         self.verifyTypeBtn.setObjectName("verifyTypeBtn")
-        self.frame_compare_verify = QtWidgets.QFrame(self.frame_compare)
-        self.frame_compare_verify.setGeometry(QtCore.QRect(0, 0, 1300, 841))
+        self.frame_compare_verify = QtWidgets.QFrame(self.centralwidget)
+        self.frame_compare_verify.setGeometry(QtCore.QRect(0, 59, 1300, 841))
         self.frame_compare_verify.setStyleSheet("    #frame_compare_verify { \n"
 " \n"
 "    \n"
@@ -363,7 +366,7 @@ class Ui_MainWindow(object):
         self.frame_compare_verify.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_compare_verify.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_compare_verify.setObjectName("frame_compare_verify")
-        self.frame_compare_verify.setVisible(False)
+        self.frame_compare_verify.close()
         self.label_compare_verify_tag = QtWidgets.QLabel(self.frame_compare_verify)
         self.label_compare_verify_tag.setGeometry(QtCore.QRect(1175, 0, 131, 131))
         self.label_compare_verify_tag.setStyleSheet("border-image: url(:/ComTag.png);")
@@ -496,6 +499,12 @@ class Ui_MainWindow(object):
 
         self.pushButton.clicked.connect(self.EncodeAllChecker)
 
+        self.searchTypeBtn.clicked.connect(self.SearchTypeBtnEvent)
+        self.verifyTypeBtn.clicked.connect(self.VerifyTypeBtnEvent)
+        self.searchTypeBtn_2.clicked.connect(self.SearchTypeBtnEvent)
+        self.verifyTypeBtn_2.clicked.connect(self.VerifyTypeBtnEvent)
+        self.selectPicBtn.clicked.connect(self.SelectPicBtnEvent)
+
 
 
 
@@ -548,10 +557,23 @@ class Ui_MainWindow(object):
         self.FrameSwitch(self.frame_tracker)  
     def EmotionTabEvent(self):
         self.TabStateChange(self.emTagS,self.emTagUs)
-        self.FrameSwitch(self.frame_em) 
+        self.FrameSwitch(self.frame_em)
+
+    def SearchTypeBtnEvent(self):
+        self.FrameSwitch(self.frame_compare)
+    def VerifyTypeBtnEvent(self):
+        self.FrameSwitch(self.frame_compare_verify)
+    def SelectPicBtnEvent(self):
+        Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+        PImage=QPixmap(Image)
+        SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
+        self.photo0.setPixmap(SPImage)        
+        
+        
 
     def EncodeAllChecker(self):
         fb.genEncodings()
+        msg=QMessageBox.information(self,"信息","建模已完成！", QMessageBox.Yes)
 
 import picture_rc
 
