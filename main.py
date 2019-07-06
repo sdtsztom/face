@@ -7,14 +7,15 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-# import faceBackend as fb
-# from faceBackend.faceLib import facelib as fl
-# from faceBackend.faceLib import facedb as fdb
-# #import numpy as np
+import faceBackend as fb
+from faceBackend.faceLib import facelib as fl
+from faceBackend.faceLib import facedb as fdb
+#import numpy as np
 import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import os.path as path
 
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
@@ -533,9 +534,6 @@ class Ui_MainWindow(object):
 		self.cap_selectPicBtn.clicked.connect(self.CapSelectPicBtnEvent)
 		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
 		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
-		self.trackType1RB.toggled.connect(self.TrackType1RBEvent)
-		self.trackType2RB.toggled.connect(self.TrackType2RBEvent)
-		self.trackType3RB.toggled.connect(self.TrackType3RBEvent)
 		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
@@ -545,9 +543,12 @@ class Ui_MainWindow(object):
 		self.cameraTimer = QtCore.QTimer()
 		self.CAM_NUM = 0
 		self.isEmCam=True
-		self.trackCheckType=True
-		self.trackFaceType=False
-		self.trackBodyType=False
+		self.startTrack=False
+		self.faceTracker=fb.FaceTracker()
+		self.siamFaceTracke=fb.SiamFaceTracker()
+		self.siamBodyTracker=fb.SiamBodyTracker()
+
+		self.startEmotion=False
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -658,20 +659,8 @@ class Ui_MainWindow(object):
 
 	def EncodeAllChecker(self):
 		fb.genEncodings()
-		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
+		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Ok)
 
-	def TrackType1RBEvent(self):
-		self.trackCheckType=True
-		self.trackFaceType=False
-		self.trackBodyType=False
-	def TrackType2RBEvent(self):
-		self.trackCheckType=False
-		self.trackFaceType=True
-		self.trackBodyType=False
-	def TrackType3RBEvent(self):
-		self.trackCheckType=False
-		self.trackFaceType=False
-		self.trackBodyType=True
 	def TrackCameraSwitchEvent(self):
 		if(self.cameraIsOn==False):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
@@ -682,11 +671,18 @@ class Ui_MainWindow(object):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
 			self.CloseCamera()
+			self.startTrack=False
 	def TrackerStartBtnEvent(self):
 		OrString=self.idLineEdit.text()
 		strList=OrString.split(",")
 		if self.cameraTimer.isActive()==True:
-			pass
+			self.startTrack=True
+			if self.trackType1RB.isChecked()==True:
+				self.faceTracker.setWantIDs(strList)
+			elif self.trackType2RB.isChecked()==True:
+				self.siamFaceTracke.setWantIDs(strList)
+			else:
+				self.siamBodyTracker.setWantIDs(strList)
 		else:
 			msg = QMessageBox.information(self.centralwidget,"错误","摄像头未打开！", QMessageBox.Yes)
 
@@ -701,6 +697,8 @@ class Ui_MainWindow(object):
 		imgOr=cv2.imread(self.ImagePath)
 		caper=fb.faceCaper()
 		img=caper.cap(imgOr)
+		caper.save()
+		msg = QMessageBox.information(self.centralwidget, "信息", "人脸图片已自动保存到%s！" % (path.abspath('.')), QMessageBox.Ok)
 		show = cv2.resize(img, (self.cap_photo0_2.width(), self.cap_photo0_2.height()))
 		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
@@ -737,18 +735,37 @@ class Ui_MainWindow(object):
 				self.trackLabelShowCamera.clear()
 
 	def ShowCamera(self):
-		_, self.image = self.cap.read()
-		if self.isEmCam==True:
-			show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
-		else:
+		if self.startTrack==True:
+			ret, frameOr = self.cap.read()
+			frameRes = None
+			if self.trackType1RB.isChecked() == True:
+				frameRes = self.faceTracker.track(frameOr)
+			elif self.trackType2RB.isChecked() == True:
+				frameRes = self.siamFaceTracke.track(frameOr)
+			else:
+				frameRes = self.siamBodyTracker.track(frameOr)
 			show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
-
-		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],show.shape[1]*3, QtGui.QImage.Format_RGB888)
-		if self.isEmCam==True:
-			self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
-		else:
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
+									 QtGui.QImage.Format_RGB888)
 			self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+		elif self.startEmotion==True:
+			pass
+		else:
+			_, self.image = self.cap.read()
+			if self.isEmCam == True:
+				show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
+			else:
+				show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
+
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
+									 QtGui.QImage.Format_RGB888)
+			if self.isEmCam == True:
+				self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+			else:
+				self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+
 
 
 import picture_rc
