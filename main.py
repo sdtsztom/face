@@ -539,9 +539,9 @@ class Ui_MainWindow(object):
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
 		self.cameraIsOn = False
-		self.cap = cv2.VideoCapture()
+		self.video='http://admin:admin@192.168.1.102:8081'
+		self.cap = cv2.VideoCapture(self.video)
 		self.cameraTimer = QtCore.QTimer()
-		self.CAM_NUM = 0
 		self.isEmCam=True
 		self.startTrack=False
 		self.faceTracker=fb.FaceTracker()
@@ -675,14 +675,18 @@ class Ui_MainWindow(object):
 	def TrackerStartBtnEvent(self):
 		OrString=self.idLineEdit.text()
 		strList=OrString.split(",")
+		wantIDs=[int(IDstr) for IDstr in strList]
 		if self.cameraTimer.isActive()==True:
 			self.startTrack=True
 			if self.trackType1RB.isChecked()==True:
-				self.faceTracker.setWantIDs(strList)
+				self.faceTracker.reset()
+				self.faceTracker.setWantIDs(wantIDs)
 			elif self.trackType2RB.isChecked()==True:
-				self.siamFaceTracke.setWantIDs(strList)
+				self.siamFaceTracke.reset()
+				self.siamFaceTracke.setWantIDs(wantIDs)
 			else:
-				self.siamBodyTracker.setWantIDs(strList)
+				self.siamBodyTracker.reset()
+				self.siamBodyTracker.setWantIDs(wantIDs)
 		else:
 			msg = QMessageBox.information(self.centralwidget,"错误","摄像头未打开！", QMessageBox.Yes)
 
@@ -717,7 +721,7 @@ class Ui_MainWindow(object):
 
 	def OpenCamera(self):
 		if self.cameraTimer.isActive() == False:
-			flag = self.cap.open(self.CAM_NUM)
+			flag = self.cap.open(self.video)
 			if flag == False:
 				msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请检测相机与电脑是否连接正确",
 													buttons=QtWidgets.QMessageBox.Ok,
@@ -744,7 +748,7 @@ class Ui_MainWindow(object):
 				frameRes = self.siamFaceTracke.track(frameOr)
 			else:
 				frameRes = self.siamBodyTracker.track(frameOr)
-			show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
+			show = cv2.resize(frameRes, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
 			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
 									 QtGui.QImage.Format_RGB888)

@@ -5,19 +5,23 @@ import numpy as np
 
 class FaceTracker(object):
     def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
-        self.wantIDs=wantIDs
-        self.captured=[False]*len(wantIDs)
+        self.setWantIDs(wantIDs)
 
         self.use_scale=use_scale
         self.scale_xy=scale_xy
         self.fFinder=fl.faceFinder(self.use_scale,self.scale_xy)
 
-        db=fdb.facedb()
-        self.wantEncodings=db.getEncodingsByIDs(wantIDs)
-        db.close()
-
     def setWantIDs(self,wantIDs):
-        self.wantIDs = wantIDs
+        if wantIDs is not None:
+            self.wantIDs = wantIDs
+            self.captured=[False]*len(wantIDs)
+            db = fdb.facedb()
+            self.wantEncodings = db.getEncodingsByIDs(wantIDs)
+            db.close()
+
+    def reset(self):
+        self.wantIDs=None
+        self.wantEncodings=None
 
     def track(self,frame,returnLocations=False):
         locations=self.fFinder.findFaces(frame)
@@ -53,57 +57,89 @@ class DetectTracker(object):
         return util.drawBox(frame,people_locations)
 
 class SiamFaceTracker(object):
-    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
+    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
         self.siamTracker.loadModel()
         self.detected=False
+        self.tic=0
+        self.detectInterval=detectInterval
 
     def setWantIDs(self, wantIDs):
-        self.wantIDs = wantIDs
+        self.faceTracker.setWantIDs(wantIDs)
 
     def track(self,frame):
-        if not self.detected:
+        location=None
+        locations=None
+        self.tic=(self.tic+1)%self.detectInterval
+        if not self.detected and not self.tic:
             locations=self.faceTracker.track(frame,True)
             if locations:
                 location=locations[0]
                 top,right,bottom,left=location
                 self.detected=True
                 self.siamTracker.init(frame,left,top,right-left,bottom-top)
-        else:
+                return fl.drawBox(frame, location)
+        if self.detected:
             location=self.siamTracker.track(frame)
-        return fl.drawBox(frame, location)
+            return fl.drawBox(frame, location)
+        else:
+            return frame
+
+    def reset(self):
+        self.detected=False
+        self.tic=0
+        self.faceTracker.reset()
+
 
 class SiamBodyTracker(object):
-    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
+    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
         self.siamTracker.loadModel()
         self.peopleDetecter=fl.personDetecter()
         self.detected=False
+        self.tic=0
+        self.detectInterval=detectInterval
 
     def setWantIDs(self,wantIDs):
-        self.wantIDs = wantIDs
+        self.faceTracker.setWantIDs(wantIDs)
 
     def track(self,frame):
-        if not self.detected:
+        location=None
+        locations=None
+        self.tic = (self.tic + 1) % self.detectInterval
+        if not self.detected and not self.tic:
             locations=self.faceTracker.track(frame,True)
             if locations:
+                print('recognized')
                 top,right,bottom,left=locations[0]
                 self.detected=True
                 peopleRects=self.peopleDetecter.findPeople(frame)
+                peopleRects=[rect[:4] for rect in peopleRects]# 最后一个为概率
                 overlaps=self.Overlaps([left,top,right,bottom],peopleRects)
                 indexBiggestOverlap=np.array(overlaps).argsort()[-1]
                 left,top,right,bottom=peopleRects[indexBiggestOverlap]
                 location=[top,right,bottom,left]
+                print("overlap:",overlaps)
+                print('location:',location)
                 self.siamTracker.init(frame,left,top,right-left,bottom-top)
-        else:
+                return fl.drawBox(frame, location)
+        if self.detected:
             location=self.siamTracker.track(frame)
-        return fl.drawBox(frame, location)
+            return fl.drawBox(frame, location)
+        else:
+            return frame
 
     def Overlaps(self, faceRect, BodyRects):
         overlaps=[0]*len(BodyRects)
         for i,bodyRect in enumerate(BodyRects):
             if util.checkIntersect(faceRect, bodyRect):
                 overlaps[i]=util.Overlap(faceRect, bodyRect)
+        return overlaps
+
+    def reset(self):
+        self.detected=False
+        self.tic=0
+        self.faceTracker.reset()
 

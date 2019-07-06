@@ -7,7 +7,7 @@ import cv2
 import face_recognition
 import io
 from mmdet.apis import init_detector, inference_detector
-from pysot.core.config import cfg
+from pysot.core.config import cfg as pysotcfg
 from pysot.models.model_builder import ModelBuilder
 from pysot.tracker.tracker_builder import build_tracker
 from .brisquequality import test_measure_BRISQUE
@@ -136,9 +136,9 @@ class siamTracker(object):
 		self.snapshot = path.join(self.model_root, 'model.pth')
 
 	def loadModel(self):
-		cfg.merge_from_file(self.config)
-		cfg.CUDA = torch.cuda.is_available()
-		self.device = torch.device('cuda' if cfg.CUDA else 'cpu')
+		pysotcfg.merge_from_file(self.config)
+		pysotcfg.CUDA = torch.cuda.is_available()
+		self.device = torch.device('cuda' if pysotcfg.CUDA else 'cpu')
 
 		# create model
 		self.model = ModelBuilder()
