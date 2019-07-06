@@ -24,7 +24,6 @@ class Ui_MainWindow(object):
 		MainWindow.setEnabled(True)
 		MainWindow.resize(1302, 901)
 
-
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.frame_encode = QtWidgets.QFrame(self.centralwidget)
@@ -121,6 +120,7 @@ class Ui_MainWindow(object):
 		self.idLineEdit.setStyleSheet("font-size: 25px")
 		self.idLineEdit.setText("")
 		self.idLineEdit.setObjectName("idLineEdit")
+		self.idLineEdit.setStyleSheet("border-image: url(:/ResultBar.png);font-size:20px;")
 		self.trackCameraSwitch = QtWidgets.QPushButton(self.frame_tracker)
 		self.trackCameraSwitch.setGeometry(QtCore.QRect(820, 640, 161, 71))
 		self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
@@ -143,16 +143,19 @@ class Ui_MainWindow(object):
 		self.trackType1RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType1RB.setObjectName("trackType1RB")
+		self.trackType1RB.setChecked(True)
 		self.trackType2RB = QtWidgets.QRadioButton(self.frame_tracker)
 		self.trackType2RB.setGeometry(QtCore.QRect(190, 160, 141, 41))
 		self.trackType2RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType2RB.setObjectName("trackType2RB")
+		self.trackType2RB.setChecked(False)
 		self.trackType3RB = QtWidgets.QRadioButton(self.frame_tracker)
 		self.trackType3RB.setGeometry(QtCore.QRect(350, 160, 141, 41))
 		self.trackType3RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType3RB.setObjectName("trackType3RB")
+		self.trackType3RB.setChecked(False)
 		self.capTagUs = QtWidgets.QPushButton(self.centralwidget)
 		self.capTagUs.setGeometry(QtCore.QRect(730, 15, 120, 30))
 		self.capTagUs.setStyleSheet("border-image: url(:/TabCapUs.png);")
@@ -530,6 +533,10 @@ class Ui_MainWindow(object):
 		self.cap_selectPicBtn.clicked.connect(self.CapSelectPicBtnEvent)
 		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
 		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
+		self.trackType1RB.toggled.connect(self.TrackType1RBEvent)
+		self.trackType2RB.toggled.connect(self.TrackType2RBEvent)
+		self.trackType3RB.toggled.connect(self.TrackType3RBEvent)
+		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
@@ -538,6 +545,9 @@ class Ui_MainWindow(object):
 		self.cameraTimer = QtCore.QTimer()
 		self.CAM_NUM = 0
 		self.isEmCam=True
+		self.trackCheckType=True
+		self.trackFaceType=False
+		self.trackBodyType=False
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -650,6 +660,18 @@ class Ui_MainWindow(object):
 		fb.genEncodings()
 		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！", QMessageBox.Yes)
 
+	def TrackType1RBEvent(self):
+		self.trackCheckType=True
+		self.trackFaceType=False
+		self.trackBodyType=False
+	def TrackType2RBEvent(self):
+		self.trackCheckType=False
+		self.trackFaceType=True
+		self.trackBodyType=False
+	def TrackType3RBEvent(self):
+		self.trackCheckType=False
+		self.trackFaceType=False
+		self.trackBodyType=True
 	def TrackCameraSwitchEvent(self):
 		if(self.cameraIsOn==False):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOn.png)}")
@@ -660,6 +682,13 @@ class Ui_MainWindow(object):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
 			self.CloseCamera()
+	def TrackerStartBtnEvent(self):
+		OrString=self.idLineEdit.text()
+		strList=OrString.split(",")
+		if self.cameraTimer.isActive()==True:
+			pass
+		else:
+			msg = QMessageBox.information(self.centralwidget,"错误","摄像头未打开！", QMessageBox.Yes)
 
 
 	def CapSelectPicBtnEvent(self):
