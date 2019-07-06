@@ -7,10 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import faceBackend as fb
-from faceBackend.faceLib import facelib as fl
-from faceBackend.faceLib import facedb as fdb
-#import numpy as np
+# import faceBackend as fb
+# from faceBackend.faceLib import facelib as fl
+# from faceBackend.faceLib import facedb as fdb
+# import numpy as np
 import cv2
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -116,6 +116,11 @@ class Ui_MainWindow(object):
 		self.trackLabelShowCamera.setStyleSheet("background-color: rgb(255, 255, 255);")
 		self.trackLabelShowCamera.setText("")
 		self.trackLabelShowCamera.setObjectName("trackLabelShowCamera")
+		self.trackLabelShowCameraFrame = QtWidgets.QLabel(self.frame_tracker)
+		self.trackLabelShowCameraFrame.setGeometry(QtCore.QRect(590, 100, 620, 520))
+		self.trackLabelShowCameraFrame.setText("")
+		self.trackLabelShowCameraFrame.setObjectName("trackLabelShowCameraFrame")
+		self.trackLabelShowCameraFrame.setStyleSheet("border-image: url(:/frame.png);")
 		self.idLineEdit = QtWidgets.QLineEdit(self.frame_tracker)
 		self.idLineEdit.setGeometry(QtCore.QRect(50, 310, 481, 51))
 		self.idLineEdit.setStyleSheet("font-size: 25px")
@@ -246,11 +251,24 @@ class Ui_MainWindow(object):
 		self.emLabelShowCamera.setStyleSheet("background-color: rgb(255, 255, 255);")
 		self.emLabelShowCamera.setText("")
 		self.emLabelShowCamera.setObjectName("emLabelShowCamera")
+		self.emLabelShowCameraFrame = QtWidgets.QLabel(self.frame_em)
+		self.emLabelShowCameraFrame.setGeometry(QtCore.QRect(370, 100, 620, 520))
+		self.emLabelShowCameraFrame.setText("")
+		self.emLabelShowCameraFrame.setObjectName("emLabelShowCameraFrame")
+		self.emLabelShowCameraFrame.setStyleSheet("border-image: url(:/frame.png);")
 		self.emCameraSwitch = QtWidgets.QPushButton(self.frame_em)
 		self.emCameraSwitch.setGeometry(QtCore.QRect(580, 650, 161, 71))
 		self.emCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 		self.emCameraSwitch.setText("")
 		self.emCameraSwitch.setObjectName("emCameraSwitch")
+		self.emStartBtn = QtWidgets.QPushButton(self.frame_em)
+		self.emStartBtn.setGeometry(QtCore.QRect(80, 320, 131, 51))
+		self.emStartBtn.setStyleSheet("QPushButton{border-image: url(:/startBtn.png)}\n"
+										   "QPushButton:hover{border-image: url(:/startBtnHover.png)}\n"
+										   "QPushButton:pressed{border-image: url(:/startBtnActive.png)}")
+		self.emStartBtn.setText("")
+		self.emStartBtn.setObjectName("emStartBtn")
+
 		self.label_emotionType = QtWidgets.QLabel(self.frame_em)
 		self.label_emotionType.setGeometry(QtCore.QRect(420, 30, 531, 51))
 		self.label_emotionType.setStyleSheet("border-image: url(:/ResultBar.png);\n"
@@ -544,11 +562,12 @@ class Ui_MainWindow(object):
 		self.CAM_NUM = 0
 		self.isEmCam=True
 		self.startTrack=False
-		self.faceTracker=fb.FaceTracker()
-		self.siamFaceTracke=fb.SiamFaceTracker()
-		self.siamBodyTracker=fb.SiamBodyTracker()
+		# self.faceTracker=fb.FaceTracker()
+		# self.siamFaceTracke=fb.SiamFaceTracker()
+		# self.siamBodyTracker=fb.SiamBodyTracker()
 
 		self.startEmotion=False
+		# self.emotionRecognizer=fb.EmotionRecognizer()
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -710,10 +729,19 @@ class Ui_MainWindow(object):
 			self.cameraIsOn=True
 			self.isEmCam=True
 			self.OpenCamera()
+
 		else:
 			self.emCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
 			self.CloseCamera()
+			self.startEmotion=False
+
+	def EmotionStartBtnEvent(self):
+		self.emotionRecognizer.reset()
+		self.startEmotion = True
+		self.emotionCount=0
+		self.canGetNextEm=True
+		self.label_emotionResult.setText("")
 
 	def OpenCamera(self):
 		if self.cameraTimer.isActive() == False:
@@ -750,7 +778,23 @@ class Ui_MainWindow(object):
 									 QtGui.QImage.Format_RGB888)
 			self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
 		elif self.startEmotion==True:
-			pass
+			if self.canGetNextEm==True:
+				self.expectEmotion=self.emotionRecognizer.genRandomRequireEmotion()
+				self.canGetNextEm=False
+			_, self.image = self.cap.read()
+			show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
+									 QtGui.QImage.Format_RGB888)
+			result=self.emotionRecognizer.getEmotion(self.image,self.expectEmotion)
+			if result==self.expectEmotion:
+				self.emotionCount+=1
+				self.canGetNextEm=True
+
+			if self.emotionCount==3:
+				self.label_emotionResult.setText("Result：是真人")
+				self.startEmotion=False
+
 		else:
 			_, self.image = self.cap.read()
 			if self.isEmCam == True:
