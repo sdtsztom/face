@@ -553,6 +553,7 @@ class Ui_MainWindow(object):
 		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
 		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
 		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
+		self.emStartBtn.clicked.connect(self.EmotionStartBtnEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
@@ -567,7 +568,7 @@ class Ui_MainWindow(object):
 		self.siamBodyTracker=fb.SiamBodyTracker()
 
 		self.startEmotion=False
-		# self.emotionRecognizer=fb.EmotionRecognizer()
+		self.emotionRecognizer=fb.EmotionRecognizer()
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -627,10 +628,14 @@ class Ui_MainWindow(object):
 		self.FrameSwitch(self.frame_compare_verify)
 	def SelectPicBtnEvent(self):
 		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+		img=cv2.imread(Image)
 		self.ImagePath=Image
 		PImage=QPixmap(Image)
 		SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
 		self.photo0.setPixmap(SPImage)
+		imageAss=fb.ImageQualityAssement()
+		score = imageAss.assement(img)
+		self.labelPS.setText("Dis越小越相似，质量检测值越小质量越高\n\n本次图片质量为%.4f"%(score))
 
 	def SelectPicsBtnEvent(self):
 		images,_=QFileDialog.getOpenFileNames(self.centralwidget,"select file","C:/")
@@ -662,9 +667,7 @@ class Ui_MainWindow(object):
 			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],3*show.shape[1], QtGui.QImage.Format_RGB888)
 			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
-		imageAss=fb.ImageQualityAssement()
-		score = imageAss.assement(imgOr)
-		self.label_compareResult.setText("Result：目标已找到,质量评估分数：%f"%(score))
+		self.label_compareResult.setText("Result：目标已找到！")
 
 	def clearPicBtnEvent(self):
 		self.photo0.clear()
@@ -748,6 +751,7 @@ class Ui_MainWindow(object):
 		self.label_emotionResult.setText("")
 
 	def OpenCamera(self):
+		self.frameNum=0
 		if self.cameraTimer.isActive() == False:
 			flag = self.cap.open(self.video)
 			if flag == False:
@@ -767,6 +771,7 @@ class Ui_MainWindow(object):
 				self.trackLabelShowCamera.clear()
 
 	def ShowCamera(self):
+		self.frameNum=(self.frameNum+1)%15
 		if self.startTrack==True:
 			ret, frameOr = self.cap.read()
 			frameRes = None
@@ -784,18 +789,22 @@ class Ui_MainWindow(object):
 		elif self.startEmotion==True:
 			if self.canGetNextEm==True:
 				self.expectEmotion=self.emotionRecognizer.genRandomRequireEmotion()
+				self.label_emotionType.setText(self.expectEmotion)
 				self.canGetNextEm=False
 			_, self.image = self.cap.read()
 			show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
 			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
 									 QtGui.QImage.Format_RGB888)
-			result=self.emotionRecognizer.getEmotion(self.image,self.expectEmotion)
-			if result==self.expectEmotion:
-				self.emotionCount+=1
-				self.canGetNextEm=True
+			self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+			if not self.frameNum:
+				result=self.emotionRecognizer.getEmotion(self.image,self.expectEmotion)
+				if result:
+					self.emotionCount+=1
+					self.canGetNextEm=True
 
 			if self.emotionCount==3:
+				self.label_emotionType.setText("")
 				self.label_emotionResult.setText("Result：是真人")
 				self.startEmotion=False
 

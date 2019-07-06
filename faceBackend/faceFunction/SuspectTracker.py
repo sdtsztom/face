@@ -93,7 +93,7 @@ class SiamFaceTracker(object):
 
 
 class SiamBodyTracker(object):
-    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25,detectInterval=10):
+    def __init__(self,wantIDs=None,use_scale=False,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
         self.siamTracker.loadModel()
