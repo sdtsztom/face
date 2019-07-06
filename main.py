@@ -25,7 +25,6 @@ class Ui_MainWindow(object):
 		MainWindow.setEnabled(True)
 		MainWindow.resize(1302, 901)
 
-
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.frame_encode = QtWidgets.QFrame(self.centralwidget)
@@ -122,6 +121,7 @@ class Ui_MainWindow(object):
 		self.idLineEdit.setStyleSheet("font-size: 25px")
 		self.idLineEdit.setText("")
 		self.idLineEdit.setObjectName("idLineEdit")
+		self.idLineEdit.setStyleSheet("border-image: url(:/ResultBar.png);font-size:20px;")
 		self.trackCameraSwitch = QtWidgets.QPushButton(self.frame_tracker)
 		self.trackCameraSwitch.setGeometry(QtCore.QRect(820, 640, 161, 71))
 		self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
@@ -144,16 +144,19 @@ class Ui_MainWindow(object):
 		self.trackType1RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType1RB.setObjectName("trackType1RB")
+		self.trackType1RB.setChecked(True)
 		self.trackType2RB = QtWidgets.QRadioButton(self.frame_tracker)
 		self.trackType2RB.setGeometry(QtCore.QRect(190, 160, 141, 41))
 		self.trackType2RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType2RB.setObjectName("trackType2RB")
+		self.trackType2RB.setChecked(False)
 		self.trackType3RB = QtWidgets.QRadioButton(self.frame_tracker)
 		self.trackType3RB.setGeometry(QtCore.QRect(350, 160, 141, 41))
 		self.trackType3RB.setStyleSheet("color: rgb(255, 0, 4);\n"
 "font-size:20px")
 		self.trackType3RB.setObjectName("trackType3RB")
+		self.trackType3RB.setChecked(False)
 		self.capTagUs = QtWidgets.QPushButton(self.centralwidget)
 		self.capTagUs.setGeometry(QtCore.QRect(730, 15, 120, 30))
 		self.capTagUs.setStyleSheet("border-image: url(:/TabCapUs.png);")
@@ -531,6 +534,7 @@ class Ui_MainWindow(object):
 		self.cap_selectPicBtn.clicked.connect(self.CapSelectPicBtnEvent)
 		self.startCapBtn.clicked.connect(self.StartCapBtnEvent)
 		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
+		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
 
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
@@ -539,6 +543,12 @@ class Ui_MainWindow(object):
 		self.cameraTimer = QtCore.QTimer()
 		self.CAM_NUM = 0
 		self.isEmCam=True
+		self.startTrack=False
+		self.faceTracker=fb.FaceTracker()
+		self.siamFaceTracke=fb.SiamFaceTracker()
+		self.siamBodyTracker=fb.SiamBodyTracker()
+
+		self.startEmotion=False
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -661,6 +671,20 @@ class Ui_MainWindow(object):
 			self.trackCameraSwitch.setStyleSheet("QPushButton{border-image: url(:/switchOff.png)}")
 			self.cameraIsOn=False
 			self.CloseCamera()
+			self.startTrack=False
+	def TrackerStartBtnEvent(self):
+		OrString=self.idLineEdit.text()
+		strList=OrString.split(",")
+		if self.cameraTimer.isActive()==True:
+			self.startTrack=True
+			if self.trackType1RB.isChecked()==True:
+				self.faceTracker.setWantIDs(strList)
+			elif self.trackType2RB.isChecked()==True:
+				self.siamFaceTracke.setWantIDs(strList)
+			else:
+				self.siamBodyTracker.setWantIDs(strList)
+		else:
+			msg = QMessageBox.information(self.centralwidget,"错误","摄像头未打开！", QMessageBox.Yes)
 
 
 	def CapSelectPicBtnEvent(self):
@@ -674,7 +698,7 @@ class Ui_MainWindow(object):
 		caper=fb.faceCaper()
 		img=caper.cap(imgOr)
 		caper.save()
-		msg=QMessageBox.information(self.centralwidget,"信息","人脸图片已自动保存到%s！"%(path.abspath('.')), QMessageBox.Ok)
+		msg = QMessageBox.information(self.centralwidget, "信息", "人脸图片已自动保存到%s！" % (path.abspath('.')), QMessageBox.Ok)
 		show = cv2.resize(img, (self.cap_photo0_2.width(), self.cap_photo0_2.height()))
 		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
 		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], 3 * show.shape[1], QtGui.QImage.Format_RGB888)
@@ -711,18 +735,37 @@ class Ui_MainWindow(object):
 				self.trackLabelShowCamera.clear()
 
 	def ShowCamera(self):
-		_, self.image = self.cap.read()
-		if self.isEmCam==True:
-			show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
-		else:
+		if self.startTrack==True:
+			ret, frameOr = self.cap.read()
+			frameRes = None
+			if self.trackType1RB.isChecked() == True:
+				frameRes = self.faceTracker.track(frameOr)
+			elif self.trackType2RB.isChecked() == True:
+				frameRes = self.siamFaceTracke.track(frameOr)
+			else:
+				frameRes = self.siamBodyTracker.track(frameOr)
 			show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
-
-		show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-		showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],show.shape[1]*3, QtGui.QImage.Format_RGB888)
-		if self.isEmCam==True:
-			self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
-		else:
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
+									 QtGui.QImage.Format_RGB888)
 			self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+		elif self.startEmotion==True:
+			pass
+		else:
+			_, self.image = self.cap.read()
+			if self.isEmCam == True:
+				show = cv2.resize(self.image, (self.emLabelShowCamera.width(), self.emLabelShowCamera.height()))
+			else:
+				show = cv2.resize(self.image, (self.trackLabelShowCamera.width(), self.trackLabelShowCamera.height()))
+
+			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0], show.shape[1] * 3,
+									 QtGui.QImage.Format_RGB888)
+			if self.isEmCam == True:
+				self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+			else:
+				self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
+
 
 
 import picture_rc

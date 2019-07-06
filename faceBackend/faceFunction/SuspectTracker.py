@@ -4,7 +4,7 @@ from ..faceLib import util
 import numpy as np
 
 class FaceTracker(object):
-    def __init__(self,wantIDs,use_scale=True,scale_xy=0.25):
+    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
         self.wantIDs=wantIDs
         self.captured=[False]*len(wantIDs)
 
@@ -15,6 +15,9 @@ class FaceTracker(object):
         db=fdb.facedb()
         self.wantEncodings=db.getEncodingsByIDs(wantIDs)
         db.close()
+
+    def setWantIDs(self,wantIDs):
+        self.wantIDs = wantIDs
 
     def track(self,frame,returnLocations=False):
         locations=self.fFinder.findFaces(frame)
@@ -50,11 +53,14 @@ class DetectTracker(object):
         return util.drawBox(frame,people_locations)
 
 class SiamFaceTracker(object):
-    def __init__(self,wantIDs,use_scale=True,scale_xy=0.25):
+    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
         self.siamTracker.loadModel()
         self.detected=False
+
+    def setWantIDs(self, wantIDs):
+        self.wantIDs = wantIDs
 
     def track(self,frame):
         if not self.detected:
@@ -69,12 +75,15 @@ class SiamFaceTracker(object):
         return fl.drawBox(frame, location)
 
 class SiamBodyTracker(object):
-    def __init__(self,wantIDs,use_scale=True,scale_xy=0.25):
+    def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
         self.siamTracker.loadModel()
         self.peopleDetecter=fl.personDetecter()
         self.detected=False
+
+    def setWantIDs(self,wantIDs):
+        self.wantIDs = wantIDs
 
     def track(self,frame):
         if not self.detected:
