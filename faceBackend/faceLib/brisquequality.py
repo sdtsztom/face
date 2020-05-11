@@ -6,20 +6,10 @@ import sys
 from scipy.special import gamma as tgamma
 import os
 
-# import svm functions (from libsvm library)   
-# if python2.x version : import svm from libsvm (sudo apt-get install python-libsvm)
-if sys.version_info[0] < 3:
-    import svm
-    import svmutil
-    from svmutil import *
-    from svm import *
-else:
-    # if python 3.x version 
-    # make sure the file is in libsvm/python folder
-    import svm
-    import svmutil
-    from svm import *
-    from svmutil import *
+import svm
+import svmutil
+from svmutil import *
+from svm import *
 
 # AGGD fit model, takes input as the MSCN Image / Pair-wise Product
 def AGGDfit(structdis):
@@ -170,8 +160,8 @@ def test_measure_BRISQUE(modelpath,dis):
         max = max_[i] 
         x.append(-1 + (2.0/(max - min) * (features[i] - min)))
     
-    # load model 
-    model = svmutil.svm_load_model(modelpath)
+    # load model
+    model = svm_load_model(modelpath)
 
     # create svm node array from python list
     x, idx = gen_svm_nodearray(x[1:], isKernel=(model.param.kernel_type == PRECOMPUTED))

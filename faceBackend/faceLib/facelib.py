@@ -7,6 +7,7 @@ import cv2
 import face_recognition
 import io
 from mmdet.apis import init_detector, inference_detector
+import mmcv
 from pysot.core.config import cfg as pysotcfg
 from pysot.models.model_builder import ModelBuilder
 from pysot.tracker.tracker_builder import build_tracker

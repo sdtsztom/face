@@ -121,8 +121,6 @@ class SiamBodyTracker(object):
                 indexBiggestOverlap=np.array(overlaps).argsort()[-1]
                 left,top,right,bottom=peopleRects[indexBiggestOverlap]
                 location=[top,right,bottom,left]
-                print("overlap:",overlaps)
-                print('location:',location)
                 self.siamTracker.init(frame,left,top,right-left,bottom-top)
                 return fl.drawBox(frame, location)
         if self.detected:

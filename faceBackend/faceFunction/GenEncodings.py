@@ -12,3 +12,5 @@ def genEncodings():
         locations=fFinder.findFaces(faceImg)
         encoding=fl.encodeFace(faceImg,locations[0])
         db.recordEncoding(ID,encoding)
+
+    return len(todoIDs)
