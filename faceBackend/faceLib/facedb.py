@@ -39,6 +39,17 @@ class facedb(object):
 		encodings = [np.frombuffer(res[i][0], dtype='float64') for i in range(len(IDList))]
 		return encodings
 
+	def getAllEncodings(self,page=0,batchSize=100):
+		'''
+		:param page: start from 0
+		数据量在100以内，直接不加参数即可取出所有Encodings
+		'''
+		sql = 'select encoding from faceEncoding limit %d,%d;' % (page*batchSize,batchSize)
+		self.cur.execute(sql);
+		res = self.cur.fetchall()
+		encodings = [np.frombuffer(res[i][0], dtype='float64') for i in range(len(res))]
+		return encodings
+
 	def getUnencodedIDs(self):
 		self.cur.execute('select ID from faceEncoding where encoded=0;')
 		res=self.cur.fetchall()
