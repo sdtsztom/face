@@ -37,7 +37,7 @@ class FaceTracker(object):
     def track(self, frame, returnType='frame'):
         '''
         函数本质为detect，在每帧detect指定人员人脸
-        :returnKind: 有infos,locations,frame三种
+        :returnType: 有infos,locations,frame三种
         '''
         locations=self.fFinder.findFaces(frame)
         unknown_encodings=fl.encodeFaces(frame,locations)
@@ -92,7 +92,7 @@ class SiamFaceTracker(object):
         locations=None
         self.tic=(self.tic+1)%self.detectInterval
         if not self.detected and not self.tic:
-            locations=self.faceTracker.track(frame,True)
+            locations=self.faceTracker.track(frame,'locations')
             if locations:
                 location=locations[0]   # 只支持追踪一个人，因此追踪第一个
                 top,right,bottom,left=location
@@ -125,15 +125,22 @@ class SiamBodyTracker(object):
     def setWantIDs(self,wantIDs):
         self.faceTracker.setWantIDs(wantIDs)
 
-    def track(self,frame):
+    def track(self,frame,firstFrameReturn='frame'):
+        '''
+        :firstFrameReturn: 有infos,locations,frame三种
+        '''
         location=None
         locations=None
         self.tic = (self.tic + 1) % self.detectInterval
         if not self.detected and not self.tic:
-            locations=self.faceTracker.track(frame,True)
+            if firstFrameReturn=='infos':
+                infos=self.faceTracker.track(frame,'infos')
+                locations=[infos[i][1] for i in range(len(infos))]
+            else:
+                locations=self.faceTracker.track(frame,'locations')
             if locations:
-                print('recognized')
-                top,right,bottom,left=locations[0]  # 只支持追踪一个人，因此追踪第一个
+                print('SiamBodyTracker: recognized!')
+                top,right,bottom,left=locations[0]  # TODO 只支持追踪一个人，因此追踪第一个
                 self.detected=True
                 peopleRects=self.peopleDetecter.findPeople(frame)
                 peopleRects=[rect[:4] for rect in peopleRects]# 最后一个为概率
@@ -142,7 +149,12 @@ class SiamBodyTracker(object):
                 left,top,right,bottom=peopleRects[indexBiggestOverlap]
                 location=[top,right,bottom,left]
                 self.siamTracker.init(frame,left,top,right-left,bottom-top)
-                return fl.drawBox(frame, location)
+                if firstFrameReturn=='frame':
+                    return fl.drawBox(frame, location)
+                elif firstFrameReturn=='locations':
+                    return location[0]  # TODO 因为暂时只支持追踪1个，所以只返回一个location
+                elif firstFrameReturn=='infos':
+                    return infos[0]
         if self.detected:
             location=self.siamTracker.track(frame)
             return fl.drawBox(frame, location)

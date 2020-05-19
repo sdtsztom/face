@@ -23,8 +23,8 @@ class m_MainWindow(QMainWindow):
 
 		self.slotInit()
 
-		self.faceTracker=fb.FaceTracker()
-		self.faceTracker.setWantIDs(-1) # track all people in the database
+		self.siamBodyTracker=fb.SiamBodyTracker()
+		self.siamBodyTracker.setWantIDs(-1) # track all people in the database
 
 		self.flagCaped=False
 		
@@ -49,15 +49,14 @@ class m_MainWindow(QMainWindow):
 		flag, image = self.cap0.read()  # cv2 img h*w*bgr
 
 		# 开始追踪
-		infos=self.faceTracker.track(image, returnType='infos')
-		if len(infos)>0:
-			id,location=infos[0]    # 暂时只能追踪一个人
-			if not self.flagCaped:
-				faceImg=fl.cropFace(image,location)
-				self.showCV2CapRawImage(self.ui.labelProfile,faceImg)
-				self.flagCaped=True
+		info=self.siamBodyTracker.track(image, firstFrameReturn='infos')    # 暂时只能追踪一个人，所以返回的是info而非infos
+		if not self.flagCaped and type(info)==list: # 两元组，[id,location]，表示发现第一次了与数据库中人员匹配的人脸
+			id,location=info
+			self.flagCaped=True
+			image = fl.drawBox(image, location)
+			faceImg=fl.cropFace(image,location)
+			self.showCV2CapRawImage(self.ui.labelProfile,faceImg)
 
-			image=fl.drawBox(image,location)
 		self.showCV2CapRawImage(self.ui.labelCamera0,image)
 
 
