@@ -8,6 +8,7 @@ import cv2
 import faceBackend as fb
 from faceBackend.faceLib import facelib as fl
 from faceBackend.faceLib import facedb as fdb
+import time
 
 
 class m_MainWindow(QMainWindow):
@@ -20,13 +21,15 @@ class m_MainWindow(QMainWindow):
 		self.cap0 = cv2.VideoCapture()
 		self.cam0Addr=0
 		self.camera0State=0
+		self.calFpsFrameInterval=30 # 大约1s计算一次
 
 		self.slotInit()
 
 		self.siamBodyTracker=fb.SiamBodyTracker()
-		self.siamBodyTracker.setWantIDs(-1) # track all people in the database
+		self.db=fdb.facedb()
 
 		self.flagCaped=False
+		self.frameNum=-1
 		
 	def slotInit(self):
 		self.timerCamera0.timeout.connect(self.showCamera0)
@@ -39,13 +42,30 @@ class m_MainWindow(QMainWindow):
 			else:
 				self.timerCamera0.start(30) # ms,about 30fps
 				self.ui.buttonSwitchCamera.setText('停止')
+				self.siamBodyTracker.setWantIDs(-1)  # track all people in the database
 		else:
 			self.timerCamera0.stop()
 			self.cap0.release()
 			self.ui.labelCamera0.clear()
+			self.ui.labelProfile.clear()
 			self.ui.buttonSwitchCamera.setText('开始')
+			self.ui.labelInfo.setText('信息：')
+			self.ui.labelFPS.setText('帧率：')
+			self.siamBodyTracker.reset()
+			self.frameNum=-1
+			self.tic=self.toc=0
+			self.flagCaped=False
 		
 	def showCamera0(self):
+		# 计算与显示帧率
+		self.frameNum=(self.frameNum+1)%self.calFpsFrameInterval
+		if self.frameNum==0:
+			self.tic=time.time()
+		elif self.frameNum==self.calFpsFrameInterval-1:
+			self.toc=time.time()
+			interval=self.toc-self.tic
+			self.ui.labelFPS.setText('帧率：%f fps'%(self.calFpsFrameInterval/interval))
+
 		flag, image = self.cap0.read()  # cv2 img h*w*bgr
 
 		# 开始追踪
@@ -54,8 +74,14 @@ class m_MainWindow(QMainWindow):
 			id,location=info
 			self.flagCaped=True
 			image = fl.drawBox(image, location)
+
+			# 显示肖像
 			faceImg=fl.cropFace(image,location)
 			self.showCV2CapRawImage(self.ui.labelProfile,faceImg)
+
+			# 显示信息
+			personInfo=self.db.getCustomOneLineInfo('select name from faceEncoding where ID=%d;'%(id))   # personInfo=[name]
+			self.ui.labelInfo.setText('姓名：'+personInfo[0])
 
 		self.showCV2CapRawImage(self.ui.labelCamera0,image)
 

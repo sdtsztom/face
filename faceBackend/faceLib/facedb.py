@@ -45,7 +45,7 @@ class facedb(object):
 		数据量在100以内，直接不加参数即可取出所有Encodings
 		'''
 		sql = 'select encoding from faceEncoding limit %d,%d;' % (page*batchSize,batchSize)
-		self.cur.execute(sql);
+		self.cur.execute(sql)
 		res = self.cur.fetchall()
 		encodings = [np.frombuffer(res[i][0], dtype='float64') for i in range(len(res))]
 		return encodings
@@ -89,3 +89,8 @@ class facedb(object):
 		self.cur.execute('select face from faceEncoding where ID=%d;'%(ID))
 		res=self.cur.fetchall()
 		return res[0][0]
+
+	def getCustomOneLineInfo(self,sql):
+		self.cur.execute(sql)
+		res = self.cur.fetchall()
+		return res[0]
