@@ -559,7 +559,7 @@ class Ui_MainWindow(object):
 		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
 		self.cameraIsOn = False
-		self.video='http://admin:admin@192.168.1.103:8081'
+		self.video='http://admin:admin@192.168.1.155:8081'
 		self.cap = cv2.VideoCapture(self.video)
 		self.cameraTimer = QtCore.QTimer()
 		self.isEmCam=True
