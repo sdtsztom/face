@@ -39,7 +39,7 @@ class facedb(object):
 		encodings = [np.frombuffer(res[i][0], dtype='float64') for i in range(len(IDList))]
 		return encodings
 
-	def getAllEncodings(self,page=0,batchSize=100):
+	def getAllEncodingsWithBatch(self,page=0,batchSize=100):
 		'''
 		:param page: start from 0
 		数据量在100以内，直接不加参数即可取出所有Encodings

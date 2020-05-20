@@ -19,7 +19,8 @@ class m_MainWindow(QMainWindow):
 		
 		self.timerCamera0 = QtCore.QTimer()
 		self.cap0 = cv2.VideoCapture()
-		self.cam0Addr=0
+		self.cam0Addr='http://admin:admin@192.168.43.176:8081'
+		#self.cam0Addr=0
 		self.camera0State=0
 		self.calFpsFrameInterval=30 # 大约1s计算一次
 
