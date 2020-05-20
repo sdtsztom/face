@@ -30,6 +30,10 @@ class m_MainWindow(QMainWindow):
 
 		self.flagCaped=False
 		self.frameNum=-1
+		self.QRectSquareProfile=QtCore.QRect(740, 40, 200, 200)
+		self.QRectSquareInfo=QtCore.QRect(740, 250, 200, 221)
+		self.QRectRecProfile=QtCore.QRect(740, 40, 200, 280)
+		self.QRectRecInfo=QtCore.QRect(740, 330, 200, 141)
 		
 	def slotInit(self):
 		self.timerCamera0.timeout.connect(self.showCamera0)
@@ -77,15 +81,30 @@ class m_MainWindow(QMainWindow):
 
 			# 显示肖像
 			faceImg=fl.cropFace(image,location)
+			h,w,_=faceImg.shape
+			print('profile ratio:',h/w)
+			self.adjustLayout(h/w)
 			self.showCV2CapRawImage(self.ui.labelProfile,faceImg)
 
 			# 显示信息
-			personInfo=self.db.getCustomOneLineInfo('select name from faceEncoding where ID=%d;'%(id))   # personInfo=[name]
-			self.ui.labelInfo.setText('姓名：'+personInfo[0])
+			personInfo=self.db.getCustomOneLineInfo('select name,sex,institute,major from faceEncoding where ID=%d;'%(id))   # personInfo=[name]
+			self.ui.labelInfo.setText('姓名：'+personInfo[0]+'\n性别：'+personInfo[1]+'\n学院：'+personInfo[2]+'\n专业：'+personInfo[3])
 
 		self.showCV2CapRawImage(self.ui.labelCamera0,image)
 
-
+	def adjustLayout(self,hwRatio):
+		ratioSquare=1
+		ratioRec=7.0/5
+		if abs(hwRatio-ratioSquare)>abs(hwRatio-ratioRec):
+			use='Rec'
+		else:
+			use='Square'
+		if use=='Rec':
+			self.ui.labelProfile.setGeometry(self.QRectRecProfile)
+			self.ui.labelInfo.setGeometry(self.QRectRecInfo)
+		else:
+			self.ui.labelProfile.setGeometry(self.QRectSquareProfile)
+			self.ui.labelInfo.setGeometry(self.QRectSquareInfo)
 
 	def showCV2CapRawImage(self,label,rawImage):
 		_,_,w,h=label.geometry().getRect() # geometry() return QRect

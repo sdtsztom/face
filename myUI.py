@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.buttonSwitchCamera.setGeometry(QtCore.QRect(800, 490, 89, 25))
         self.buttonSwitchCamera.setObjectName("buttonSwitchCamera")
         self.labelInfo = QtWidgets.QLabel(self.centralwidget)
-        self.labelInfo.setGeometry(QtCore.QRect(740, 330, 200, 61))
+        self.labelInfo.setGeometry(QtCore.QRect(740, 330, 200, 141))
         self.labelInfo.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.labelInfo.setObjectName("labelInfo")
         self.labelProfile = QtWidgets.QLabel(self.centralwidget)
