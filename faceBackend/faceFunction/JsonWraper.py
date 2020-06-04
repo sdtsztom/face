@@ -11,9 +11,14 @@ def genEncodings():
 	res={'numEncoded':res}
 	return json.dumps(res)
 
-def faceSearchCompare(img, location=None):
-	infos=CompareFace.faceSearchCompare(img,location)
+def faceIdentification(img, location=None):
+	infos=CompareFace.faceIdentification(img, location)
 	res={}
 	for i,info in enumerate(infos):
 		res['person%d'%(i)]={'ID':info[0],'name':info[1],'dis':info[2]}
-	return  res
+	return json.dumps(res)
+
+def faceVerification(imgList):
+	flag = CompareFace.faceVerification(imgList)
+	res={'Same':flag}
+	return json.dumps(res)

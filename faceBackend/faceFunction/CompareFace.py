@@ -2,7 +2,7 @@ from ..faceLib import facelib as fl
 from ..faceLib import facedb as fdb
 import numpy as np
 
-def faceSearchCompare(img, location=None):
+def faceIdentification(img, location=None):
     '''
     :param location: style: [left,right,bottom,left]
     '''
@@ -18,7 +18,7 @@ def faceSearchCompare(img, location=None):
     infos=[[CandidatesInfo[i][0],CandidatesInfo[i][1],distances[index]] for i,index in enumerate(CandidatesIndex)]   #info:[ID,name,distance]
     return infos
 
-def faceCheckCompare(imgList):
+def faceVerification(imgList):
     fFinder = fl.faceFinder()
     encodings=[0]*len(imgList)
     for i,img in enumerate(imgList):

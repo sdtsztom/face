@@ -697,17 +697,17 @@ class Ui_MainWindow(object):
 			labelInfo.setText(fileName)
 
 		# cal result
-		Result=fb.faceCheckCompare(imageList)
+		res=json.loads(fb.faceVerification(imageList))
 
 		# show decision
-		if Result==True:
+		if res['same']:
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
 			self.label_verifyResult.setText("Result:不是同一个人")
 
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)
-		res=fb.faceSearchCompare(imgOr)
+		res=json.loads(fb.faceIdentification(imgOr))
 		infos=res.values
 		for info,photo,labelInfo in zip(infos,self.photoPool,self.labelInfoPool):
 			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(info['ID'],info['name'],info['dis']))
