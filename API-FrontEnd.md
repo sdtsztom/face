@@ -16,7 +16,7 @@
     + 'dis':float - 此人计算出来的与被搜索人图片的距离
     
  # faceVerification
- ## Params
+## Params
 - imgList: list of cv2 img
 ## Return
 - 'same':bool - 是否为同一个人
@@ -26,3 +26,13 @@
 - img:cv2 img - 图片
 ## Return
 - 'score':float - 评测分数
+
+# checkEmotion
+## Params
+- frame:cv2 img - 检测的一帧图像
+- expectEmotion:str - 正确的表情预期
+- useTimeLimit:bool - 是否使用超时检测
+## Return
+- 'predict':str - 在expectEmotion为None时，返回预测结果
+- 'pass':bool - 检测结果是否与预期表情一致
+- 'error':str - 超时警示信息

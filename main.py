@@ -573,7 +573,7 @@ class Ui_MainWindow(object):
 		self.siamBodyTracker=fb.SiamBodyTracker()
 
 		self.doingEmotionRecg=False
-		self.emotionRecognizer=fb.EmotionRecognizer()
+		self.emotionRecognizer=fb.EmotionRecognizerJson()
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -853,11 +853,11 @@ class Ui_MainWindow(object):
 			self.emLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
 			self.emotionFrameNum = (self.emotionFrameNum + 1) % self.EmotionRecgFrameInterval
 			if not self.emotionFrameNum:   # time to check
-				result=self.emotionRecognizer.checkEmotion(self.image, self.expectEmotion)
-				if type(result)==str:   # time use out
+				result=json.loads(self.emotionRecognizer.checkEmotion(self.image, self.expectEmotion))
+				if 'error' in result:   # time use out
 					self.label_emotionResult.setText("Result：超时检测失败！")
 					self.doingEmotionRecg = False
-				elif result:
+				elif result['pass']:
 					self.doneEmotionCount+=1
 					if self.doneEmotionCount == 3:
 						self.label_emotionResult.setText("Result：是真人")
@@ -884,7 +884,7 @@ class Ui_MainWindow(object):
 		_,_,w,h=label.geometry().getRect() # geometry() return QRect
 		img = cv2.resize(rawImage, (w, h))
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-		Qimg = QtGui.QImage(img.data, img.shape[1], img.shape[0], 3*w,QtGui.QImage.Format_RGB888)
+		Qimg = QtGui.QImage(img.data, w, h, 3*w,QtGui.QImage.Format_RGB888)
 		label.setPixmap(QtGui.QPixmap.fromImage(Qimg))
 
 	def showPic(self,label,path):

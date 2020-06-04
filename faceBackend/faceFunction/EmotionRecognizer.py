@@ -37,14 +37,14 @@ class EmotionRecognizer(object):
         if useTimeLimit:
             self.TimeLeft-=1
             if self.TimeLeft<0:
-                return 'Time use out!'
+                return 'error:Time use out!'  # 超时错误
         locations=self.fFinder.findFaces(frame)
         if locations:
             location=locations[0]
             face=fl.cropFace(frame,location)
             if expectEmotion is None:
-                return self.recog.predict(face)
+                return self.recog.predict(face) # 没有传入expectEmotion的情况下，返回预测出的表情
             else:
-                return expectEmotion==self.recog.predict(face)
+                return expectEmotion==self.recog.predict(face)  # 有传入expectEmotion的情况下，返回bool判断
         else:
-            return False
+            return False    # 没有检测到人脸的情况下，返回False

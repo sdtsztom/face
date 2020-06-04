@@ -31,3 +31,39 @@ class ImageQualityAssementJson(ImageQualityAssement):
 		score=super().assement(img)
 		res={'score':score}
 		return json.dumps(res)
+
+class EmotionRecognizerJson(EmotionRecognizer):
+	def __init__(self):
+		super().__init__()
+
+	def getSupportEmotion(self):
+		return super().getSupportEmotion()
+
+	def getNumTimeLimit(self):
+		return super().getNumTimeLimit()
+
+	def getRecgFrameInterval(self):
+		return super().getRecgFrameInterval()
+
+	def setNumTimeLimit(self, numTimeLimit):
+		super().setNumTimeLimit(numTimeLimit)
+
+	def setRecgFrameInterval(self, recgFrameInterval):
+		super().setRecgFrameInterval(recgFrameInterval)
+
+	def genRandomRequireEmotion(self):
+		return super().genRandomRequireEmotion()
+
+	def reset(self):
+		super().reset()
+
+	def checkEmotion(self, frame, expectEmotion=None, useTimeLimit=True):
+		res={}
+		ret=super().checkEmotion(frame, expectEmotion, useTimeLimit)
+		if type(ret)==str and ret.startswith('error'):  # 超时错误
+			res['error']=ret
+		else:   # 预测结果
+			res['predict']=ret
+		if type(ret)==bool: # 返回确认结果
+			res['pass']=ret
+		return json.dumps(res)
