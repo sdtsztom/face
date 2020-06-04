@@ -1,8 +1,8 @@
 # -*-encoding:utf-8-*-
 
-from . import SuspectTracker
-from . import CompareFace
-from . import faceCaper
-from . import GenEncodings
-from . import EmotionRecognizer
-from . import ImageQualityAssement
+from .SuspectTracker import *
+from .CompareFace import *
+from .faceCaper import *
+from .GenEncodings import *
+from .EmotionRecognizer import *
+from .ImageQualityAssement import *
