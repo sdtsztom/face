@@ -707,8 +707,8 @@ class Ui_MainWindow(object):
 
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)
-		info=fb.faceSearchCompare(imgOr)
-		for personInfo,photo,labelInfo in zip(info,self.photoPool,self.labelInfoPool):
+		infos=fb.faceSearchCompare(imgOr)
+		for personInfo,photo,labelInfo in zip(infos,self.photoPool,self.labelInfoPool):
 			ID,name,dis=personInfo
 			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(ID,name,dis))
 			imgBlob=self.db.getFaceByID(int(ID))
