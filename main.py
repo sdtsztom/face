@@ -16,6 +16,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os.path as path
+import AppConfig
 
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
@@ -356,6 +357,7 @@ class Ui_MainWindow(object):
 		self.selectPicBtn.setText("")
 		self.selectPicBtn.setObjectName("selectPicBtn")
 
+		# Add extra (not in the .ui)
 		self.com_startBtn = QtWidgets.QPushButton(self.frame_compare)
 		self.com_startBtn.setGeometry(QtCore.QRect(170, 690, 131, 51))
 		self.com_startBtn.setStyleSheet("QPushButton{border-image: url(:/startBtn.png)}\n"
@@ -411,12 +413,12 @@ class Ui_MainWindow(object):
 		self.label_compare_verify_tag.setText("")
 		self.label_compare_verify_tag.setObjectName("label_compare_verify_tag")
 		self.listViewFileName = QtWidgets.QListView(self.frame_compare_verify)
-		self.listViewFileName.setGeometry(QtCore.QRect(310, 90, 761, 500))
+		self.listViewFileName.setGeometry(QtCore.QRect(10, 130, 561, 511))
 		self.listViewFileName.setStyleSheet("background-color:rgb(255,255,255);\n")
 		self.listViewFileName.setObjectName("listViewFileName")
 		# self.listViewFileName.setStyleSheet("border-image: url(:/frame.png);")
 		self.selectPicBtn2 = QtWidgets.QPushButton(self.frame_compare_verify)
-		self.selectPicBtn2.setGeometry(QtCore.QRect(515, 590, 131, 51))
+		self.selectPicBtn2.setGeometry(QtCore.QRect(70, 660, 131, 51))
 		self.selectPicBtn2.setStyleSheet("QPushButton{border-image: url(:/selectBtn.png)}\n"
 "QPushButton:hover{border-image: url(:/selectBtnHover.png)}\n"
 "QPushButton:pressed{border-image: url(:/selectBtnActive.png)}")
@@ -431,7 +433,7 @@ class Ui_MainWindow(object):
 		self.label_verifyResult.setAlignment(QtCore.Qt.AlignCenter)
 		self.label_verifyResult.setObjectName("label_verifyResult")
 		self.comVerifyStartBtn = QtWidgets.QPushButton(self.frame_compare_verify)
-		self.comVerifyStartBtn.setGeometry(QtCore.QRect(735, 590, 131, 51))
+		self.comVerifyStartBtn.setGeometry(QtCore.QRect(400, 660, 131, 51))
 		self.comVerifyStartBtn.setStyleSheet("QPushButton{border-image: url(:/startBtn.png)}\n"
 "QPushButton:hover{border-image: url(:/startBtnHover.png)}\n"
 "QPushButton:pressed{border-image: url(:/startBtnActive.png)}")
@@ -556,10 +558,11 @@ class Ui_MainWindow(object):
 		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
 		self.emStartBtn.clicked.connect(self.EmotionStartBtnEvent)
 
-		self.photoPool=[self.photo0,self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
+		self.photoFramePool=[self.photoFrame1,self.photoFrame2,self.photoFrame3,self.photoFrame4,self.photoFrame5]
+		self.photoPool=[self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
 		self.cameraIsOn = False
-		self.video='http://admin:admin@192.168.1.155:8081'
+		self.video=AppConfig.AppConfig.videoAddr
 		self.cap = cv2.VideoCapture(self.video)
 		self.cameraTimer = QtCore.QTimer()
 		self.isEmCam=True
@@ -625,17 +628,32 @@ class Ui_MainWindow(object):
 		self.FrameSwitch(self.frame_em)
 
 	def SearchTypeBtnEvent(self):
-		self.FrameSwitch(self.frame_compare)
+		if self.currentFrame==self.frame_compare_verify:
+			# change parent to reuse widget
+			for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
+				widget.setParent(self.frame_compare)
+
+			# clean widgets reused
+			for widget in  self.photoPool+self.labelInfoPool:
+				widget.clear()
+
+			# switch frame
+			self.FrameSwitch(self.frame_compare)
 	def VerifyTypeBtnEvent(self):
-		self.FrameSwitch(self.frame_compare_verify)
+		if self.currentFrame==self.frame_compare:
+			for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
+				widget.setParent(self.frame_compare_verify)
+
+			for widget in  self.photoPool+self.labelInfoPool:
+				widget.clear()
+
+			self.FrameSwitch(self.frame_compare_verify)
 	def SelectPicBtnEvent(self):
 		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
 		if(len(Image)!=0):  # TODO这里可以完善：过滤器，判断文件是否存在
 			img=cv2.imread(Image)
 			self.ImagePath=Image
-			PImage=QPixmap(Image)
-			SPImage=PImage.scaled(self.photo0.width(),self.photo0.height(),aspectRatioMode=Qt.KeepAspectRatio)
-			self.photo0.setPixmap(SPImage)
+			self.showCV2imgInLabel(self.photo0,img)
 			imageAss=fb.ImageQualityAssement()
 			score = imageAss.assement(img)
 			self.labelPS.setText("Dis越小越相似，质量检测值越小质量越高\n\n本次图片质量为%.4f"%(score))
@@ -649,10 +667,38 @@ class Ui_MainWindow(object):
 		self.listViewFileName.setModel(slm)
 
 	def	VerifyCompareBtnEvent(self):
+		self.label_verifyResult.clear()
+		fileNameList=self.tempslm.stringList()
 		imageList = []
-		for imgName in self.tempslm.stringList():
+		for imgName in fileNameList:
 			imageList.append(cv2.imread(imgName))
+		fileNameList=[path.basename(i) for i in fileNameList]
+
+		# cut out n data to show, n=len(self.photoPool)
+		showNumLimit=min(len(fileNameList),len(self.photoPool))
+		imageListLimited=imageList[:showNumLimit]
+		fileNameListLimited=fileNameList[:showNumLimit]
+		photoPoolLimited=self.photoPool[:showNumLimit]
+		labelInfoPoolLimited=self.labelInfoPool[:showNumLimit]
+
+
+		# show result
+		# clear widget
+		for widget in self.photoPool + self.labelInfoPool:
+			widget.clear()
+
+		# show imgs
+		for label,img in zip(photoPoolLimited,imageListLimited):
+			self.showCV2imgInLabel(label,img)
+
+		# show info
+		for fileName,labelInfo in zip(fileNameListLimited,labelInfoPoolLimited):
+			labelInfo.setText(fileName)
+
+		# cal result
 		Result=fb.faceCheckCompare(imageList)
+
+		# show decision
 		if Result==True:
 			self.label_verifyResult.setText("Result:是同一个人")
 		else:
@@ -661,15 +707,12 @@ class Ui_MainWindow(object):
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)
 		info=fb.faceSearchCompare(imgOr)
-		for personInfo,photo,labelInfo in zip(info,self.photoPool[1:],self.labelInfoPool):
+		for personInfo,photo,labelInfo in zip(info,self.photoPool,self.labelInfoPool):
 			ID,name,dis=personInfo
 			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(ID,name,dis))
 			imgBlob=self.db.getFaceByID(int(ID))
 			img=fl.jpgBlob2img(imgBlob)
-			show = cv2.resize(img, (self.photo0.width(), self.photo0.height()))
-			show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
-			showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],3*show.shape[1], QtGui.QImage.Format_RGB888)
-			photo.setPixmap(QtGui.QPixmap.fromImage(showImage))
+			self.showCV2imgInLabel(photo,img)
 		self.label_compareResult.setText("Result：目标已找到！")
 
 	def clearPicBtnEvent(self):
@@ -819,9 +862,6 @@ class Ui_MainWindow(object):
 						self.doingEmotionRecg = False
 					else:
 						self.needNextEmotion=True
-
-
-
 		else:
 			_, self.image = self.cap.read()
 			if self.isEmCam == True:
@@ -837,7 +877,19 @@ class Ui_MainWindow(object):
 			else:
 				self.trackLabelShowCamera.setPixmap(QtGui.QPixmap.fromImage(showImage))
 
+	def showCV2imgInLabel(self,label,rawImage):
+		_,_,w,h=label.geometry().getRect() # geometry() return QRect
+		img = cv2.resize(rawImage, (w, h))
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		Qimg = QtGui.QImage(img.data, img.shape[1], img.shape[0], 3*w,QtGui.QImage.Format_RGB888)
+		label.setPixmap(QtGui.QPixmap.fromImage(Qimg))
 
+	def showPic(self,label,path):
+		# deprecated
+		# 使用QT的方法读取和显示图片在读取用手机拍摄的照片时会旋转90度
+		PImage = QPixmap(path)
+		SPImage = PImage.scaled(label.width(), label.height(), aspectRatioMode=Qt.KeepAspectRatio)
+		label.setPixmap(SPImage)
 
 import picture_rc
 
