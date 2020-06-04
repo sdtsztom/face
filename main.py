@@ -707,11 +707,11 @@ class Ui_MainWindow(object):
 
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)
-		infos=fb.faceSearchCompare(imgOr)
-		for personInfo,photo,labelInfo in zip(infos,self.photoPool,self.labelInfoPool):
-			ID,name,dis=personInfo
-			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(ID,name,dis))
-			imgBlob=self.db.getFaceByID(int(ID))
+		res=fb.faceSearchCompare(imgOr)
+		infos=res.values
+		for info,photo,labelInfo in zip(infos,self.photoPool,self.labelInfoPool):
+			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(info['ID'],info['name'],info['dis']))
+			imgBlob=self.db.getFaceByID(int(info['ID']))
 			img=fl.jpgBlob2img(imgBlob)
 			self.showCV2imgInLabel(photo,img)
 		self.label_compareResult.setText("Result：目标已找到！")
