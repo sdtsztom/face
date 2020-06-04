@@ -52,6 +52,7 @@ class faceFinder(object):
 		if self.use_scale:
 			for i,face_location in enumerate(face_locations):
 				face_locations[i]=[int(i/self.scale_xy) for i in face_location]  # restore location
+				# face_recognition style location : [top,right,bottom,left]
 
 		return face_locations
 
