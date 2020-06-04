@@ -51,14 +51,14 @@
 # Return
 - img:框好的捕获结果图像
 
-# assement
+# ImageQualityAssement.assement
 - 功能：图像质量评价
 ## Params
 - img:cv2 img - 图片
 ## Return
 - 'score':float - 评测分数
 
-# checkEmotion
+# EmotionRecognizer.checkEmotion
 - 功能：表情检测
 ## Params
 - frame:cv2 img - 检测的一帧图像

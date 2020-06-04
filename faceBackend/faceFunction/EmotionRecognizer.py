@@ -1,14 +1,15 @@
 from ..faceLib import facelib as fl
 import random
+from .FunctionConfig import FunctionConfig
 
 class EmotionRecognizer(object):
     def __init__(self):
         self.recog=fl.facialExpressionRecer()
-        self.supportEmotion=self.class_names = ['Angry','Happy','Surprise','Neutral']
+        self.supportEmotion=self.class_names = FunctionConfig.EmotionRecSupportEmotion['supportEmotion']
         self.EmotionPool=self.supportEmotion.copy()
         self.fFinder=fl.faceFinder()
-        self.numTimeLimit=30    # 大约每个表情10次机会，5秒左右
-        self.recgFrameInterval=15 # 推荐每隔15帧检测一次
+        self.numTimeLimit=FunctionConfig.EmotionRecConfig['numTimeLimit']    # 30检测机会，大约每个表情10次机会，5秒左右
+        self.recgFrameInterval=FunctionConfig.EmotionRecConfig['recgFrameInterval']  # 推荐每隔15帧检测一次
         self.TimeLeft=self.numTimeLimit
 
     def getSupportEmotion(self):

@@ -4,7 +4,7 @@ from ..faceLib import facelib as fl
 def genEncodings():
     db=fdb.facedb()
     todoIDs=db.getUnencodedIDs()
-    # 为数据规模考量，暂不支持批量encode
+    # TODO 为数据规模考量，暂不支持批量encode
     fFinder=fl.faceFinder()
     for ID in todoIDs:
         faceBlob=db.getFaceByID(ID)

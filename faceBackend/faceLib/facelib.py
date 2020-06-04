@@ -25,6 +25,8 @@ from . import transforms
 from .models import *
 from PIL import Image
 
+from .libConfig import libConfig # 相对导入，使用绝对导入方式无法导入
+
 torch.set_num_threads(1)
 
 class faceFinder(object):
@@ -118,11 +120,11 @@ def rgb2gray(rgb):
 
 class personDetecter(object):
 	def __init__(self):
-		self.mmedeRoot='/media/tsz/Data/Work/Tracking/Library/mmdetection'
-		self.config_file='configs/faster_rcnn_r50_fpn_1x.py'
-		self.checkpoint_file = 'checkpoints/faster_rcnn_r50_fpn_1x_20181010-3d1b3351.pth'
-		self.config_file=path.join(self.mmedeRoot,self.config_file)
-		self.checkpoint_file=path.join(self.mmedeRoot,self.checkpoint_file)
+		self.mmdetRoot=libConfig.personDetConfig['mmdetRoot']
+		self.config_file=libConfig.personDetConfig['configFile']
+		self.checkpoint_file = libConfig.personDetConfig['checkpoint']
+		self.config_file=path.join(self.mmdetRoot, self.config_file)
+		self.checkpoint_file=path.join(self.mmdetRoot, self.checkpoint_file)
 		self.model = init_detector(self.config_file,self.checkpoint_file, device='cuda:0')
 
 	def findPeople(self,frame):
@@ -131,11 +133,10 @@ class personDetecter(object):
 
 class siamTracker(object):
 	def __init__(self):
-		self.pysot_root = '/media/tsz/Data/Work/Tracking/Library/pysot'
-		self.model_name = 'siamrpn_alex_dwxcorr'
-		self.model_root = path.join(self.pysot_root, 'experiments', self.model_name)
-		self.config= path.join(self.model_root, 'config.yaml')
-		self.snapshot = path.join(self.model_root, 'model.pth')
+		self.model_name = libConfig.siamTrackerConfig['modelType']
+		self.model_root = path.join(libConfig.siamTrackerConfig['modelRoot'], self.model_name)
+		self.config= path.join(self.model_root, libConfig.siamTrackerConfig['configBaseName'])
+		self.snapshot = path.join(self.model_root, libConfig.siamTrackerConfig['model.pth'])
 
 	def loadModel(self):
 		pysotcfg.merge_from_file(self.config)
@@ -162,9 +163,8 @@ class siamTracker(object):
 
 class facialExpressionRecer(object):
 	def __init__(self):
-		self.modelpath='/media/tsz/Data/Work/Tracking/GithubProject/Facial-Expression-Recognition.Pytorch/FER2013_VGG19/PrivateTest_model.t7'
-		self.net=VGG('VGG19')
-		self.checkpoint = torch.load(self.modelpath)
+		self.net=VGG(libConfig.facialRecConfig['net'])
+		self.checkpoint = torch.load(libConfig.facialRecConfig['modelPath'])
 		self.net.load_state_dict(self.checkpoint['net'])
 		self.net.cuda()
 		self.net.eval()
