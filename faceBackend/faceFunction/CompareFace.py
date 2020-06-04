@@ -12,8 +12,8 @@ def faceSearchCompare(img, location=None):
     distances=fl.faceDistance(known_encodings,unknown_encoding)
     CandidatesIndex=distances.argsort()[:5]
     CandidatesInfo=db.getPeopleInfoByIndexes(CandidatesIndex)
-    info=[[CandidatesInfo[i][0],CandidatesInfo[i][1],distances[index]] for i,index in enumerate(CandidatesIndex)]   #info:[ID,name,distance]
-    return info
+    infos=[[CandidatesInfo[i][0],CandidatesInfo[i][1],distances[index]] for i,index in enumerate(CandidatesIndex)]   #info:[ID,name,distance]
+    return infos
 
 def faceCheckCompare(imgList):
     fFinder = fl.faceFinder()
