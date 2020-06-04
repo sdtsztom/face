@@ -16,6 +16,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os.path as path
+import json
 import AppConfig
 
 class Ui_MainWindow(object):
@@ -726,7 +727,8 @@ class Ui_MainWindow(object):
 
 
 	def EncodeAllChecker(self):
-		numEncoded=fb.genEncodings()
+		res=json.loads(fb.genEncodings())
+		numEncoded=res['numEncoded']
 		msg=QMessageBox.information(self.centralwidget,"信息","建模已完成！共建模%d个人脸"%(numEncoded), QMessageBox.Ok)
 
 	def TrackCameraSwitchEvent(self):
