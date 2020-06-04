@@ -4,7 +4,7 @@ import random
 class EmotionRecognizer(object):
     def __init__(self):
         self.recog=fl.facialExpressionRecer()
-        self.supportEmotion=self.class_names = ['Angry','Happy','Sad', 'Surprise','Neutral']
+        self.supportEmotion=self.class_names = ['Angry','Happy','Surprise','Neutral']
         self.EmotionPool=self.supportEmotion.copy()
         self.fFinder=fl.faceFinder()
         self.numTimeLimit=30    # 大约每个表情10次机会，5秒左右
@@ -27,7 +27,7 @@ class EmotionRecognizer(object):
         self.recgFrameInterval=recgFrameInterval
 
     def genRandomRequireEmotion(self):
-        return self.EmotionPool.pop(random.randrange(1,len(self.EmotionPool)))
+        return self.EmotionPool.pop(random.randrange(0,len(self.EmotionPool)))
 
     def reset(self):
         self.EmotionPool=self.supportEmotion.copy()
