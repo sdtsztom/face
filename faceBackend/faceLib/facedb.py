@@ -56,13 +56,13 @@ class facedb(object):
 		self.cur.execute('update faceEncoding set encoding=%s,encoded=1 where '+temp,(encoding.tostring()))
 		self.conn.commit()
 
-	def getPeopleInfoByIndexes(self,Indexes):
-		info=[0]*len(Indexes)
+	def getPeopleInfosByIndexes(self, Indexes):
+		infos=[0]*len(Indexes)
 		for i,index in enumerate(Indexes):
 			self.cur.execute('select ID,name from faceEncoding limit %d,1;'%index);
 			res=self.cur.fetchall()
-			info[i]=[res[0][0],res[0][1]]
-		return info
+			infos[i]=[res[0][0],res[0][1]]
+		return infos
 
 	def getFacesByIDs(self,IDList):
 		if len(IDList)==1:
