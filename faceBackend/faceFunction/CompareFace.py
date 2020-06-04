@@ -24,10 +24,6 @@ def faceVerification(imgList):
     for i,img in enumerate(imgList):
         location=fFinder.findFaces(img)[0]
         encodings[i]=fl.encodeFace(img, location)
-    flag_all_pass=True
-    for encoding in encodings:
-        res=fl.faceCompare(encodings,encoding)
-        flag_all_pass=np.all(res)
-        if not flag_all_pass:
-            break
-    return flag_all_pass
+    res=fl.faceCompare(encodings,encodings[0])
+    flag_all_pass=np.all(res)
+    return bool(flag_all_pass)  # 转化为python内置bool类型，容错率更高

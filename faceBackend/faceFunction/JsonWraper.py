@@ -20,10 +20,10 @@ def faceIdentification(img, location=None):
 
 def faceVerification(imgList):
 	flag = CompareFace.faceVerification(imgList)
-	res={'Same':flag}
+	res={'same':flag}
 	return json.dumps(res)
 
-class ImageQualityAssementJson(ImageQualityAssement):
+class ImageQualityAssement(ImageQualityAssement.ImageQualityAssement):
 	def __init__(self):
 		super().__init__()
 
@@ -32,7 +32,7 @@ class ImageQualityAssementJson(ImageQualityAssement):
 		res={'score':score}
 		return json.dumps(res)
 
-class EmotionRecognizerJson(EmotionRecognizer):
+class EmotionRecognizer(EmotionRecognizer.EmotionRecognizer):
 	def __init__(self):
 		super().__init__()
 

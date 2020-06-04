@@ -573,7 +573,7 @@ class Ui_MainWindow(object):
 		self.siamBodyTracker=fb.SiamBodyTracker()
 
 		self.doingEmotionRecg=False
-		self.emotionRecognizer=fb.EmotionRecognizerJson()
+		self.emotionRecognizer=fb.EmotionRecognizer()
 
 		self.cameraTimer.timeout.connect(self.ShowCamera)
 
@@ -655,7 +655,7 @@ class Ui_MainWindow(object):
 			img=cv2.imread(Image)
 			self.ImagePath=Image
 			self.showCV2imgInLabel(self.photo0,img)
-			imageAss=fb.ImageQualityAssementJson()
+			imageAss=fb.ImageQualityAssement()
 			res = json.loads(imageAss.assement(img))
 			score=res['score']
 			self.labelPS.setText("Dis越小越相似，质量检测值越小质量越高\n\n本次图片质量为%.4f"%(score))
@@ -709,7 +709,7 @@ class Ui_MainWindow(object):
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)
 		res=json.loads(fb.faceIdentification(imgOr))
-		infos=res.values
+		infos=res.values()
 		for info,photo,labelInfo in zip(infos,self.photoPool,self.labelInfoPool):
 			labelInfo.setText("ID:%s Name:%s Dis:%.4f"%(info['ID'],info['name'],info['dis']))
 			imgBlob=self.db.getFaceByID(int(info['ID']))
