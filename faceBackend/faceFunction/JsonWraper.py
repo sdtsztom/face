@@ -22,3 +22,12 @@ def faceVerification(imgList):
 	flag = CompareFace.faceVerification(imgList)
 	res={'Same':flag}
 	return json.dumps(res)
+
+class ImageQualityAssementJson(ImageQualityAssement):
+	def __init__(self):
+		super().__init__()
+
+	def assement(self,img):
+		score=super().assement(img)
+		res={'score':score}
+		return json.dumps(res)

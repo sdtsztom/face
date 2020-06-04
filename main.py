@@ -655,8 +655,9 @@ class Ui_MainWindow(object):
 			img=cv2.imread(Image)
 			self.ImagePath=Image
 			self.showCV2imgInLabel(self.photo0,img)
-			imageAss=fb.ImageQualityAssement()
-			score = imageAss.assement(img)
+			imageAss=fb.ImageQualityAssementJson()
+			res = json.loads(imageAss.assement(img))
+			score=res['score']
 			self.labelPS.setText("Dis越小越相似，质量检测值越小质量越高\n\n本次图片质量为%.4f"%(score))
 
 	def SelectPicsBtnEvent(self):

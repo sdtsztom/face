@@ -20,3 +20,9 @@
 - imgList: list of cv2 img
 ## Return
 - 'same':bool - 是否为同一个人
+
+# assement
+## Params
+- img:cv2 img - 图片
+## Return
+- 'score':float - 评测分数
