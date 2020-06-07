@@ -1,7 +1,8 @@
 from ..faceLib import facelib as fl
 import os.path as path
+from . import functionInterface as funcItf
 
-class faceCaper(object):
+class faceCaper(funcItf.faceCaper):
     def __init__(self):
         self.img=0
         self.locations=0

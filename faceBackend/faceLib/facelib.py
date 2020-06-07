@@ -26,10 +26,11 @@ from .models import *
 from PIL import Image
 
 from .libConfig import libConfig # 相对导入，使用绝对导入方式无法导入
+from . import facelibInterface as flItf
 
 torch.set_num_threads(1)
 
-class faceFinder(object):
+class faceFinder(flItf.faceFinder):
 	def __init__(self,use_scale=False,scale_xy=0.5):
 		self.use_scale=use_scale  # turn this on if high resolution
 		self.scale_xy=scale_xy
@@ -116,9 +117,9 @@ def jpgBlob2img(blob):
 	return cv2.imdecode(np.frombuffer(blob,np.int8),-1)
 
 def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
+	return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
-class personDetecter(object):
+class personDetecter(flItf.objectDetecter):
 	def __init__(self):
 		self.mmdetRoot=libConfig.personDetConfig['mmdetRoot']
 		self.config_file=libConfig.personDetConfig['configFile']
@@ -131,12 +132,15 @@ class personDetecter(object):
 		detectRes=inference_detector(self.model, frame)
 		return detectRes[0]
 
-class siamTracker(object):
+	def findObjects(self,type):
+		pass
+
+class siamTracker(flItf.tracker):
 	def __init__(self):
 		self.model_name = libConfig.siamTrackerConfig['modelType']
 		self.model_root = path.join(libConfig.siamTrackerConfig['modelRoot'], self.model_name)
 		self.config= path.join(self.model_root, libConfig.siamTrackerConfig['configBaseName'])
-		self.snapshot = path.join(self.model_root, libConfig.siamTrackerConfig['model.pth'])
+		self.snapshot = path.join(self.model_root, libConfig.siamTrackerConfig['modelBaseName'])
 
 	def loadModel(self):
 		pysotcfg.merge_from_file(self.config)
@@ -153,15 +157,16 @@ class siamTracker(object):
 		# build tracker
 		self.tracker = build_tracker(self.model)
 
-	def init(self,frame,x,y,width,height):
-		self.tracker.init(frame, [x, y, width, height])
+	def initTracker(self, frame, box):
+		x, y, width, height=box
+		self.tracker.initTracker(frame, [x, y, width, height])
 
 	def track(self,frame):
 		outputs = self.tracker.track(frame)
 		bbox = list(map(int, outputs['bbox']))
 		return [bbox[1],bbox[0]+bbox[2],bbox[1]+bbox[3],bbox[0]]
 
-class facialExpressionRecer(object):
+class facialExpressionRecer(flItf.emotionRec):
 	def __init__(self):
 		self.net=VGG(libConfig.facialRecConfig['net'])
 		self.checkpoint = torch.load(libConfig.facialRecConfig['modelPath'])

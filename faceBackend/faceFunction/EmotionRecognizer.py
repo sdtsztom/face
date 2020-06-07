@@ -1,11 +1,12 @@
 from ..faceLib import facelib as fl
 import random
 from .FunctionConfig import FunctionConfig
+from . import functionInterface as funcItf
 
-class EmotionRecognizer(object):
+class EmotionRecognizer(funcItf.EmotionRec):
     def __init__(self):
         self.recog=fl.facialExpressionRecer()
-        self.supportEmotion=self.class_names = FunctionConfig.EmotionRecSupportEmotion['supportEmotion']
+        self.supportEmotion=self.class_names = FunctionConfig.EmotionRecConfig['supportEmotion']
         self.EmotionPool=self.supportEmotion.copy()
         self.fFinder=fl.faceFinder()
         self.numTimeLimit=FunctionConfig.EmotionRecConfig['numTimeLimit']    # 30检测机会，大约每个表情10次机会，5秒左右

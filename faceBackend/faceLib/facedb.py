@@ -2,7 +2,9 @@
 import pymysql
 import numpy as np
 
-class facedb(object):
+from . import facedbInterface as fdbItf
+
+class facedb(fdbItf.facedb):
 	def __init__(self,ip='localhost',user='tsz',pwd='123'):
 		self._connect=True
 		self.conn=pymysql.connect('localhost','tsz','123','faces')

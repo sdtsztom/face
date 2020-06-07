@@ -1,9 +1,10 @@
 from ..faceLib import facelib as fl
 from ..faceLib import facedb as fdb
 from ..faceLib import util
+from . import functionInterface as funcItf
 import numpy as np
 
-class FaceTracker(object):
+class FaceTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
         self.setWantIDs(wantIDs)
 
@@ -47,16 +48,16 @@ class FaceTracker(object):
     #         if want_index!=-1 and self.captured[want_index]==False:
     #             fl.recordFace(frame,locations[i],path.join(self.save_path,'%d.jpg'%(self.wantIDs[want_index])))
 
-class DetectTracker(object):
-    def __init__(self,save_path):
-        self.person_detecter=fl.personDetecter()
+# class DetectTracker(funcItf.Tracker):    # no useage yet
+#     def __init__(self,save_path):
+#         self.person_detecter=fl.personDetecter()
+#
+#     def track(self,frame):
+#         people_boxes=self.person_detecter.findPeople(frame)
+#         people_locations=util.boxes2locations(people_boxes)
+#         return util.drawBox(frame,people_locations)
 
-    def track(self,frame):
-        people_boxes=self.person_detecter.findPeople(frame)
-        people_locations=util.boxes2locations(people_boxes)
-        return util.drawBox(frame,people_locations)
-
-class SiamFaceTracker(object):
+class SiamFaceTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
@@ -78,7 +79,7 @@ class SiamFaceTracker(object):
                 location=locations[0]
                 top,right,bottom,left=location
                 self.detected=True
-                self.siamTracker.init(frame,left,top,right-left,bottom-top)
+                self.siamTracker.initTracker(frame, [left, top, right - left, bottom - top])
                 return fl.drawBox(frame, location)
         if self.detected:
             location=self.siamTracker.track(frame)
@@ -92,7 +93,7 @@ class SiamFaceTracker(object):
         self.faceTracker.reset()
 
 
-class SiamBodyTracker(object):
+class SiamBodyTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=False,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
@@ -121,7 +122,6 @@ class SiamBodyTracker(object):
                 indexBiggestOverlap=np.array(overlaps).argsort()[-1]
                 left,top,right,bottom=peopleRects[indexBiggestOverlap]
                 location=[top,right,bottom,left]
-                self.siamTracker.init(frame,left,top,right-left,bottom-top)
                 return fl.drawBox(frame, location)
         if self.detected:
             location=self.siamTracker.track(frame)
