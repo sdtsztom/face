@@ -29,6 +29,9 @@ class Ui_MainWindow(object):
 
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
+
+		# set up frame encode
+
 		self.frame_encode = QtWidgets.QFrame(self.centralwidget)
 		self.frame_encode.setGeometry(QtCore.QRect(0, 59, 1300, 841))
 		self.frame_encode.setStyleSheet("    #frame_encode { \n"
@@ -99,6 +102,9 @@ class Ui_MainWindow(object):
 		self.emTagS.setText("")
 		self.emTagS.setObjectName("emTagS")
 		self.emTagS.setVisible(False)
+
+		# set up frame tracker
+
 		self.frame_tracker = QtWidgets.QFrame(self.centralwidget)
 		self.frame_tracker.setGeometry(QtCore.QRect(-1, 59, 1301, 841))
 		self.frame_tracker.setStyleSheet("    #frame_tracker { \n"
@@ -176,6 +182,9 @@ class Ui_MainWindow(object):
 		self.capTagS.setText("")
 		self.capTagS.setObjectName("capTagS")
 		self.capTagS.setVisible(False)
+
+		# set frame capture
+
 		self.frame_capture = QtWidgets.QFrame(self.centralwidget)
 		self.frame_capture.setGeometry(QtCore.QRect(0, 59, 1300, 841))
 		self.frame_capture.setStyleSheet("    #frame_capture { \n"
@@ -225,6 +234,9 @@ class Ui_MainWindow(object):
 "QPushButton:pressed{border-image: url(:/startBtnActive.png)}")
 		self.startCapBtn.setText("")
 		self.startCapBtn.setObjectName("startCapBtn")
+
+		# set frame emotion recognition
+
 		self.frame_em = QtWidgets.QFrame(self.centralwidget)
 		self.frame_em.setGeometry(QtCore.QRect(0, 59, 1300, 841))
 		self.frame_em.setStyleSheet("    #frame_em { \n"
@@ -634,6 +646,8 @@ class Ui_MainWindow(object):
 		self.currentFrame=self.frame_encode
 		self.currentSTab=self.encodeTagS
 		self.currentUsTab=self.encodeTagUs
+
+		# slot function connect
 
 		self.encodeTagUs.clicked.connect(self.EncodeTabEvent)
 		self.comTagUs.clicked.connect(self.CompareTabEvent)
