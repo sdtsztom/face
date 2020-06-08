@@ -4,7 +4,7 @@ from ..faceLib import util
 from . import functionInterface as funcItf
 import numpy as np
 
-class FaceTracker(object):  # TODO 待继承
+class FaceTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25):
         self.setWantIDs(wantIDs)
 
@@ -57,7 +57,7 @@ class FaceTracker(object):  # TODO 待继承
 #         people_locations=util.boxes2locations(people_boxes)
 #         return util.drawBox(frame,people_locations)
 
-class SiamFaceTracker(object):  # TODO 待继承
+class SiamFaceTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=True,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()
@@ -93,7 +93,7 @@ class SiamFaceTracker(object):  # TODO 待继承
         self.faceTracker.reset()
 
 
-class SiamBodyTracker(object):  # TODO 待继承
+class SiamBodyTracker(funcItf.Tracker):  # TODO 待继承
     def __init__(self,wantIDs=None,use_scale=False,scale_xy=0.25,detectInterval=10):
         self.faceTracker=FaceTracker(wantIDs,use_scale,scale_xy)
         self.siamTracker=fl.siamTracker()

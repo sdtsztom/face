@@ -159,7 +159,7 @@ class siamTracker(flItf.tracker):
 
 	def initTracker(self, frame, box):
 		x, y, width, height=box
-		self.tracker.initTracker(frame, [x, y, width, height])
+		self.tracker.init(frame, [x, y, width, height])
 
 	def track(self,frame):
 		outputs = self.tracker.track(frame)
