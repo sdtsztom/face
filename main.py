@@ -279,6 +279,9 @@ class Ui_MainWindow(object):
 "font-family:Roman times;")
 		self.label_emotionType.setAlignment(QtCore.Qt.AlignCenter)
 		self.label_emotionType.setObjectName("label_emotionType")
+
+		# set up frame_compare
+
 		self.frame_compare = QtWidgets.QFrame(self.centralwidget)
 		self.frame_compare.setGeometry(QtCore.QRect(0, 59, 1300, 841))
 		self.frame_compare.setStyleSheet("    #frame_compare { \n"
@@ -290,6 +293,9 @@ class Ui_MainWindow(object):
 		self.frame_compare.setFrameShadow(QtWidgets.QFrame.Raised)
 		self.frame_compare.setObjectName("frame_compare")
 		self.frame_compare.close()
+
+		# photoFrame set
+
 		self.photoFrame0 = QtWidgets.QLabel(self.frame_compare)
 		self.photoFrame0.setGeometry(QtCore.QRect(120, 230, 260, 370))
 		self.photoFrame0.setStyleSheet("border-image: url(:/frame.png);")
@@ -320,6 +326,9 @@ class Ui_MainWindow(object):
 		self.photoFrame5.setStyleSheet("border-image: url(:/frame.png);")
 		self.photoFrame5.setText("")
 		self.photoFrame5.setObjectName("photoFrame5")
+
+		# photo set
+
 		self.photo0 = QtWidgets.QLabel(self.frame_compare)
 		self.photo0.setGeometry(QtCore.QRect(125, 235, 250, 360))
 		self.photo0.setText("")
@@ -350,6 +359,42 @@ class Ui_MainWindow(object):
 		self.photo5.setText("")
 		self.photo5.setAlignment(QtCore.Qt.AlignCenter)
 		self.photo5.setObjectName("photo5")
+
+		# label info set
+
+		self.labelInfo1 = QtWidgets.QLabel(self.frame_compare)
+		self.labelInfo1.setGeometry(QtCore.QRect(710, 330, 181, 31))
+		self.labelInfo1.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo1.setObjectName("labelInfo1")
+		self.labelInfo2 = QtWidgets.QLabel(self.frame_compare)
+		self.labelInfo2.setGeometry(QtCore.QRect(950, 330, 181, 31))
+		self.labelInfo2.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo2.setObjectName("labelInfo2")
+		self.labelInfo3 = QtWidgets.QLabel(self.frame_compare)
+		self.labelInfo3.setGeometry(QtCore.QRect(600, 710, 181, 31))
+		self.labelInfo3.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo3.setObjectName("labelInfo3")
+		self.labelInfo4 = QtWidgets.QLabel(self.frame_compare)
+		self.labelInfo4.setGeometry(QtCore.QRect(830, 710, 181, 31))
+		self.labelInfo4.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo4.setObjectName("labelInfo4")
+		self.labelInfo5 = QtWidgets.QLabel(self.frame_compare)
+		self.labelInfo5.setGeometry(QtCore.QRect(1060, 710, 181, 31))
+		self.labelInfo5.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo5.setObjectName("labelInfo5")
+
+		self.labelPS = QtWidgets.QLabel(self.frame_compare)
+		self.labelPS.setGeometry(QtCore.QRect(190, 20, 281, 71))
+		self.labelPS.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                           "color: rgb(0, 170, 255);\n"
+		                           "font-size:15px")
+		self.labelPS.setObjectName("labelPS")
+
 		self.selectPicBtn = QtWidgets.QPushButton(self.frame_compare)
 		self.selectPicBtn.setGeometry(QtCore.QRect(170, 620, 131, 51))
 		self.selectPicBtn.setStyleSheet("QPushButton{border-image: url(:/selectBtn.png)}\n"
@@ -397,6 +442,9 @@ class Ui_MainWindow(object):
 		self.verifyTypeBtn.setStyleSheet("border-image: url(:/VerifyBtn.png);")
 		self.verifyTypeBtn.setText("")
 		self.verifyTypeBtn.setObjectName("verifyTypeBtn")
+
+		# set up frame_compare_verify
+
 		self.frame_compare_verify = QtWidgets.QFrame(self.centralwidget)
 		self.frame_compare_verify.setGeometry(QtCore.QRect(0, 59, 1300, 841))
 		self.frame_compare_verify.setStyleSheet("    #frame_compare_verify { \n"
@@ -408,6 +456,90 @@ class Ui_MainWindow(object):
 		self.frame_compare_verify.setFrameShadow(QtWidgets.QFrame.Raised)
 		self.frame_compare_verify.setObjectName("frame_compare_verify")
 		self.frame_compare_verify.close()
+
+		# photo set
+
+		self.photoFrame01 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photoFrame01.setGeometry(QtCore.QRect(700, 20, 200, 300))
+		self.photoFrame01.setStyleSheet("border-image: url(:/frame.png);")
+		self.photoFrame01.setText("")
+		self.photoFrame01.setObjectName("photoFrame01")
+		self.photoFrame02 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photoFrame02.setGeometry(QtCore.QRect(940, 20, 200, 300))
+		self.photoFrame02.setStyleSheet("border-image: url(:/frame.png);")
+		self.photoFrame02.setText("")
+		self.photoFrame02.setObjectName("photoFrame02")
+		self.photoFrame03 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photoFrame03.setGeometry(QtCore.QRect(820, 390, 200, 300))
+		self.photoFrame03.setStyleSheet("border-image: url(:/frame.png);")
+		self.photoFrame03.setText("")
+		self.photoFrame03.setObjectName("photoFrame03")
+		self.photoFrame04 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photoFrame04.setGeometry(QtCore.QRect(1050, 390, 200, 300))
+		self.photoFrame04.setStyleSheet("border-image: url(:/frame.png);")
+		self.photoFrame04.setText("")
+		self.photoFrame04.setObjectName("photoFrame04")
+		self.photoFrame05 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photoFrame05.setGeometry(QtCore.QRect(590, 390, 200, 300))
+		self.photoFrame05.setStyleSheet("border-image: url(:/frame.png);")
+		self.photoFrame05.setText("")
+		self.photoFrame05.setObjectName("photoFrame05")
+
+		# photo set
+		self.photo01 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photo01.setGeometry(QtCore.QRect(705, 25, 190, 290))
+		self.photo01.setText("")
+		self.photo01.setAlignment(QtCore.Qt.AlignCenter)
+		self.photo01.setObjectName("photo01")
+		self.photo02 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photo02.setGeometry(QtCore.QRect(945, 25, 190, 290))
+		self.photo02.setText("")
+		self.photo02.setAlignment(QtCore.Qt.AlignCenter)
+		self.photo02.setObjectName("photo02")
+		self.photo03 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photo03.setGeometry(QtCore.QRect(595, 395, 190, 290))
+		self.photo03.setText("")
+		self.photo03.setAlignment(QtCore.Qt.AlignCenter)
+		self.photo03.setObjectName("photo03")
+		self.photo04 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photo04.setGeometry(QtCore.QRect(825, 395, 190, 290))
+		self.photo04.setText("")
+		self.photo04.setAlignment(QtCore.Qt.AlignCenter)
+		self.photo04.setObjectName("photo04")
+		self.photo05 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.photo05.setGeometry(QtCore.QRect(1055, 395, 190, 290))
+		self.photo05.setText("")
+		self.photo05.setAlignment(QtCore.Qt.AlignCenter)
+		self.photo05.setObjectName("photo05")
+
+		# label info set
+
+		self.labelInfo01 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.labelInfo01.setGeometry(QtCore.QRect(710, 330, 181, 31))
+		self.labelInfo01.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo01.setObjectName("labelInfo01")
+		self.labelInfo02 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.labelInfo02.setGeometry(QtCore.QRect(950, 330, 181, 31))
+		self.labelInfo02.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo02.setObjectName("labelInfo02")
+		self.labelInfo03 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.labelInfo03.setGeometry(QtCore.QRect(600, 710, 181, 31))
+		self.labelInfo03.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo03.setObjectName("labelInfo03")
+		self.labelInfo04 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.labelInfo04.setGeometry(QtCore.QRect(830, 710, 181, 31))
+		self.labelInfo04.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo04.setObjectName("labelInfo04")
+		self.labelInfo05 = QtWidgets.QLabel(self.frame_compare_verify)
+		self.labelInfo05.setGeometry(QtCore.QRect(1060, 710, 181, 31))
+		self.labelInfo05.setStyleSheet("background-color: rgb(49, 45, 61);\n"
+		                              "color: rgb(0, 170, 255);")
+		self.labelInfo05.setObjectName("labelInfo05")
+
 		self.label_compare_verify_tag = QtWidgets.QLabel(self.frame_compare_verify)
 		self.label_compare_verify_tag.setGeometry(QtCore.QRect(1175, 0, 131, 131))
 		self.label_compare_verify_tag.setStyleSheet("border-image: url(:/ComTag.png);")
@@ -450,37 +582,6 @@ class Ui_MainWindow(object):
 		self.searchTypeBtn_2.setStyleSheet("border-image: url(:/SearchBtn.png);")
 		self.searchTypeBtn_2.setText("")
 		self.searchTypeBtn_2.setObjectName("searchTypeBtn_2")
-		self.labelInfo1 = QtWidgets.QLabel(self.frame_compare)
-		self.labelInfo1.setGeometry(QtCore.QRect(710, 330, 181, 31))
-		self.labelInfo1.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);")
-		self.labelInfo1.setObjectName("labelInfo1")
-		self.labelInfo2 = QtWidgets.QLabel(self.frame_compare)
-		self.labelInfo2.setGeometry(QtCore.QRect(950, 330, 181, 31))
-		self.labelInfo2.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);")
-		self.labelInfo2.setObjectName("labelInfo2")
-		self.labelInfo3 = QtWidgets.QLabel(self.frame_compare)
-		self.labelInfo3.setGeometry(QtCore.QRect(600, 710, 181, 31))
-		self.labelInfo3.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);")
-		self.labelInfo3.setObjectName("labelInfo3")
-		self.labelInfo4 = QtWidgets.QLabel(self.frame_compare)
-		self.labelInfo4.setGeometry(QtCore.QRect(830, 710, 181, 31))
-		self.labelInfo4.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);")
-		self.labelInfo4.setObjectName("labelInfo4")
-		self.labelInfo5 = QtWidgets.QLabel(self.frame_compare)
-		self.labelInfo5.setGeometry(QtCore.QRect(1060, 710, 181, 31))
-		self.labelInfo5.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);")
-		self.labelInfo5.setObjectName("labelInfo5")
-		self.labelPS = QtWidgets.QLabel(self.frame_compare)
-		self.labelPS.setGeometry(QtCore.QRect(190, 20, 281, 71))
-		self.labelPS.setStyleSheet("background-color: rgb(49, 45, 61);\n"
-"color: rgb(0, 170, 255);\n"
-"font-size:15px")
-		self.labelPS.setObjectName("labelPS")
 		self.photoFrame0.raise_()
 		self.photoFrame1.raise_()
 		self.photoFrame2.raise_()
@@ -562,6 +663,9 @@ class Ui_MainWindow(object):
 		self.photoFramePool=[self.photoFrame1,self.photoFrame2,self.photoFrame3,self.photoFrame4,self.photoFrame5]
 		self.photoPool=[self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
 		self.labelInfoPool = [self.labelInfo1, self.labelInfo2, self.labelInfo3, self.labelInfo4, self.labelInfo5]
+		self.photoFrame0Pool=[self.photoFrame01,self.photoFrame02,self.photoFrame03,self.photoFrame04,self.photoFrame05]
+		self.photo0Pool=[self.photo01,self.photo02,self.photo03,self.photo04,self.photo05]
+		self.labelInfo0Pool=[self.labelInfo01, self.labelInfo02, self.labelInfo03, self.labelInfo04, self.labelInfo05]
 		self.cameraIsOn = False
 		self.video=AppConfig.AppConfig.videoAddr
 		self.cap = cv2.VideoCapture(self.video)
@@ -629,26 +733,28 @@ class Ui_MainWindow(object):
 		self.FrameSwitch(self.frame_em)
 
 	def SearchTypeBtnEvent(self):
-		if self.currentFrame==self.frame_compare_verify:
-			# change parent to reuse widget
-			for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
-				widget.setParent(self.frame_compare)
-
-			# clean widgets reused
-			for widget in  self.photoPool+self.labelInfoPool:
-				widget.clear()
-
-			# switch frame
-			self.FrameSwitch(self.frame_compare)
+		# if self.currentFrame==self.frame_compare_verify:
+		# 	# change parent to reuse widget
+		# 	for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
+		# 		widget.setParent(self.frame_compare)
+		#
+		# 	# clean widgets reused
+		# 	for widget in  self.photoPool+self.labelInfoPool:
+		# 		widget.clear()
+		#
+		# 	# switch frame
+		# 	self.FrameSwitch(self.frame_compare)
+		self.FrameSwitch(self.frame_compare)
 	def VerifyTypeBtnEvent(self):
-		if self.currentFrame==self.frame_compare:
-			for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
-				widget.setParent(self.frame_compare_verify)
-
-			for widget in  self.photoPool+self.labelInfoPool:
-				widget.clear()
-
-			self.FrameSwitch(self.frame_compare_verify)
+		# if self.currentFrame==self.frame_compare:
+		# 	for widget in self.photoFramePool+self.photoPool+self.labelInfoPool:
+		# 		widget.setParent(self.frame_compare_verify)
+		#
+		# 	for widget in  self.photoPool+self.labelInfoPool:
+		# 		widget.clear()
+		#
+		# 	self.FrameSwitch(self.frame_compare_verify)
+		self.FrameSwitch(self.frame_compare_verify)
 	def SelectPicBtnEvent(self):
 		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
 		if(len(Image)!=0):  # TODO这里可以完善：过滤器，判断文件是否存在
@@ -677,16 +783,16 @@ class Ui_MainWindow(object):
 		fileNameList=[path.basename(i) for i in fileNameList]
 
 		# cut out n data to show, n=len(self.photoPool)
-		showNumLimit=min(len(fileNameList),len(self.photoPool))
+		showNumLimit=min(len(fileNameList),len(self.photo0Pool))
 		imageListLimited=imageList[:showNumLimit]
 		fileNameListLimited=fileNameList[:showNumLimit]
-		photoPoolLimited=self.photoPool[:showNumLimit]
-		labelInfoPoolLimited=self.labelInfoPool[:showNumLimit]
+		photoPoolLimited=self.photo0Pool[:showNumLimit]
+		labelInfoPoolLimited=self.labelInfo0Pool[:showNumLimit]
 
 
 		# show result
 		# clear widget
-		for widget in self.photoPool + self.labelInfoPool:
+		for widget in self.photo0Pool + self.labelInfo0Pool:
 			widget.clear()
 
 		# show imgs
@@ -743,6 +849,7 @@ class Ui_MainWindow(object):
 			self.cameraIsOn=False
 			self.CloseCamera()
 			self.doingTrack=False
+
 	def TrackerStartBtnEvent(self):
 		OrString=self.idLineEdit.text()
 		strList=OrString.split(",")
