@@ -59,11 +59,17 @@ class faceFinder(flItf.faceFinder):
 
 		return face_locations
 
-def encodeFace(frame,face_location):
+def encodeFace(frame,face_location=None):
+	if face_location is None:
+		ff=faceFinder()
+		face_location=ff.findFaces(frame)[0]
 	rgb_frame=frame[:,:,::-1]
 	return face_recognition.face_encodings(rgb_frame,[face_location])[0]
 
-def encodeFaces(frame,face_locations):
+def encodeFaces(frame,face_locations=None):
+	if face_locations is None:
+		ff=faceFinder()
+		face_locations=ff.findFaces(frame)
 	rgb_frame=frame[:,:,::-1]
 	return face_recognition.face_encodings(rgb_frame,face_locations)
 
