@@ -18,12 +18,18 @@ def faceIdentification(img, location=None):
     infos=[[CandidatesInfo[i][0],CandidatesInfo[i][1],distances[index]] for i,index in enumerate(CandidatesIndex)]   #info:[ID,name,distance]
     return infos
 
-def faceVerification(imgList):
+def faceVerification(imgList,detail=False):
+    '''
+    拿第一张照片和其他照片比较若全为true，则为同一个人
+    '''
     fFinder = fl.faceFinder()
-    encodings=[0]*len(imgList)
+    encodings=[0]*(len(imgList))
     for i,img in enumerate(imgList):
         location=fFinder.findFaces(img)[0]
         encodings[i]=fl.encodeFace(img, location)
-    res=fl.faceCompare(encodings,encodings[0])
-    flag_all_pass=np.all(res)
-    return bool(flag_all_pass)  # 转化为python内置bool类型，容错率更高
+    res=fl.faceCompare(encodings[1:],encodings[0])
+    if detail:
+        return list(map(bool,res))
+    else:
+        flag_all_pass=np.all(res)
+        return bool(flag_all_pass)  # 转化为python内置bool类型，容错率更高

@@ -148,7 +148,7 @@ class Ui_MainWindow(object):
 		self.trackerStartBtn.setText("")
 		self.trackerStartBtn.setObjectName("trackerStartBtn")
 		self.label = QtWidgets.QLabel(self.frame_tracker)
-		self.label.setGeometry(QtCore.QRect(53, 272, 241, 31))
+		self.label.setGeometry(QtCore.QRect(53, 272, 481, 31))
 		self.label.setStyleSheet("background-color: rgb(49, 45, 61);\n"
 "color: rgb(0, 170, 255);")
 		self.label.setObjectName("label")
@@ -558,10 +558,18 @@ class Ui_MainWindow(object):
 		self.label_compare_verify_tag.setText("")
 		self.label_compare_verify_tag.setObjectName("label_compare_verify_tag")
 		self.listViewFileName = QtWidgets.QListView(self.frame_compare_verify)
-		self.listViewFileName.setGeometry(QtCore.QRect(10, 130, 561, 511))
+		self.listViewFileName.setGeometry(QtCore.QRect(10, 170, 561, 471))
 		self.listViewFileName.setStyleSheet("background-color:rgb(255,255,255);\n")
 		self.listViewFileName.setObjectName("listViewFileName")
 		# self.listViewFileName.setStyleSheet("border-image: url(:/frame.png);")
+		self.person2Verify=QtWidgets.QLineEdit(self.frame_compare_verify)
+		self.person2Verify.setGeometry(QtCore.QRect(10,140,461,25))
+		self.person2Verify.setText('被比对人(可选)：输入被比对人的ID或人脸图像路径')
+		self.person2Verify.setObjectName('person2Verify')
+		self.BtnChoosePerson2Verify=QtWidgets.QPushButton(self.frame_compare_verify)
+		self.BtnChoosePerson2Verify.setGeometry(QtCore.QRect(480,140,89,25))
+		self.BtnChoosePerson2Verify.setText('选择照片')
+		self.BtnChoosePerson2Verify.setObjectName('BtnChoosePerson2Verify')
 		self.selectPicBtn2 = QtWidgets.QPushButton(self.frame_compare_verify)
 		self.selectPicBtn2.setGeometry(QtCore.QRect(70, 660, 131, 51))
 		self.selectPicBtn2.setStyleSheet("QPushButton{border-image: url(:/selectBtn.png)}\n"
@@ -673,6 +681,7 @@ class Ui_MainWindow(object):
 		self.emCameraSwitch.clicked.connect(self.EmotionCameraSwitchEvent)
 		self.trackerStartBtn.clicked.connect(self.TrackerStartBtnEvent)
 		self.emStartBtn.clicked.connect(self.EmotionStartBtnEvent)
+		self.BtnChoosePerson2Verify.clicked.connect(self.BtnChoosePerson2VerifyEvent)
 
 		self.photoFramePool=[self.photoFrame1,self.photoFrame2,self.photoFrame3,self.photoFrame4,self.photoFrame5]
 		self.photoPool=[self.photo1,self.photo2,self.photo3,self.photo4,self.photo5]
@@ -769,9 +778,18 @@ class Ui_MainWindow(object):
 		#
 		# 	self.FrameSwitch(self.frame_compare_verify)
 		self.FrameSwitch(self.frame_compare_verify)
+
+	def BtnChoosePerson2VerifyEvent(self):
+		imgPath,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
+		self.person2Verify.setText(imgPath)
+		if imgPath:
+			img=cv2.imread(imgPath)
+			self.showCV2imgInLabel(self.photo01,img)
+			self.labelInfo01.setText('被比对人')
+
 	def SelectPicBtnEvent(self):
 		Image,_=QFileDialog.getOpenFileName(self.centralwidget,"select file","C:/")
-		if(len(Image)!=0):  # TODO这里可以完善：过滤器，判断文件是否存在
+		if Image:  # TODO这里可以完善：过滤器，判断文件是否存在
 			img=cv2.imread(Image)
 			self.ImagePath=Image
 			self.showCV2imgInLabel(self.photo0,img)
@@ -789,20 +807,41 @@ class Ui_MainWindow(object):
 		self.listViewFileName.setModel(slm)
 
 	def	VerifyCompareBtnEvent(self):
+		# clear result
 		self.label_verifyResult.clear()
+
+		# deside verify type
+		person2Verify=self.person2Verify.text()
+		if person2Verify:
+			if path.exists(person2Verify):
+				# specifiedVerify=True
+				# person2VerifyType='path'
+				person2VerifyImg=cv2.imread(person2Verify)
+				# person2VerifyEncoding=fl.encodeFace(person2VerifyImg)
+			elif person2Verify.isdigit():
+				specifiedVerify = True
+				# person2VerifyType = 'ID'
+				person2VerifyImg=fl.jpgBlob2img(self.db.getFaceByID(int(person2Verify)))
+				# person2VerifyEncoding=self.db.getEncodingByID(int(person2Verify))
+			else:
+				specifiedVerify=False
+
+		# read imgs to verify
 		fileNameList=self.tempslm.stringList()
 		imageList = []
 		for imgName in fileNameList:
 			imageList.append(cv2.imread(imgName))
 		fileNameList=[path.basename(i) for i in fileNameList]
+		if specifiedVerify: # 若specifiedVerify，则第一张图片为被对比人
+			imageList=[person2VerifyImg]+imageList
+			fileNameList=['被比对人']+fileNameList
 
-		# cut out n data to show, n=len(self.photoPool)
+		# prepare n data to show, n=len(self.photoPool)
 		showNumLimit=min(len(fileNameList),len(self.photo0Pool))
 		imageListLimited=imageList[:showNumLimit]
 		fileNameListLimited=fileNameList[:showNumLimit]
 		photoPoolLimited=self.photo0Pool[:showNumLimit]
 		labelInfoPoolLimited=self.labelInfo0Pool[:showNumLimit]
-
 
 		# show result
 		# clear widget
@@ -818,13 +857,19 @@ class Ui_MainWindow(object):
 			labelInfo.setText(fileName)
 
 		# cal result
-		res=json.loads(fb.faceVerification(imageList))
+		detail=False
+		if specifiedVerify:
+			detail=True
+		res=json.loads(fb.faceVerification(imageList,detail))   # 利用了faceVerification的判断特点：即拿第一个人与剩下的比较
 
 		# show decision
-		if res['same']:
-			self.label_verifyResult.setText("Result:是同一个人")
+		if specifiedVerify:
+			for judge,label in zip(res['same'][:showNumLimit-1],self.labelInfo0Pool[1:showNumLimit]):
+				judge='相同' if judge else '不同'
+				label.setText(label.text()+' 与被比对人'+judge)
 		else:
-			self.label_verifyResult.setText("Result:不是同一个人")
+			judge='是' if res['same'] else '不是'
+			self.label_verifyResult.setText("Result:%s同一个人"%(judge))
 
 	def ComStartBtnEvent(self):
 		imgOr=cv2.imread(self.ImagePath)

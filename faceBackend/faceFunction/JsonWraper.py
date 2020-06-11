@@ -18,9 +18,9 @@ def faceIdentification(img, location=None):
 		res['person%d'%(i)]={'ID':info[0],'name':info[1],'dis':info[2]}
 	return json.dumps(res)
 
-def faceVerification(imgList):
-	flag = CompareFace.faceVerification(imgList)
-	res={'same':flag}
+def faceVerification(imgList,detail=False):
+	res = CompareFace.faceVerification(imgList,detail)
+	res={'same':res}
 	return json.dumps(res)
 
 class ImageQualityAssement(ImageQualityAssement.ImageQualityAssement):
