@@ -75,8 +75,3 @@ class facedb(fdbItf.facedb):
 		res=self.cur.fetchall()
 		faces = [res[i][0] for i in range(len(IDList))]
 		return faces
-
-	def getFaceByID(self,ID):
-		self.cur.execute('select face from faceEncoding where ID=%d;'%(ID))
-		res=self.cur.fetchall()
-		return res[0][0]
